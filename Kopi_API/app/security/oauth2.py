@@ -11,9 +11,14 @@ from sqlalchemy.orm import Session
 
 from app.data import database, models
 
-SECRET_KEY = os.getenv("KOPI_SECRET_KEY", "kopichingon")
+from app.data import database, models
+from app.core.config import settings 
+
+SECRET_KEY = settings.KOPI_SECRET_KEY
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("KOPI_TOKEN_EXPIRE_MINUTES", "1440"))
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.KOPI_TOKEN_EXPIRE_MINUTES
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -79,3 +84,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario no encontrado.")
 
     return usuario
+
+def get_current_admin(usuario_actual=Depends(get_current_user)):
+    """
+    Dependencia estricta: Solo permite el paso si el usuario tiene privilegios de administrador.
+    """
+    if not getattr(usuario_actual, 'es_admin', False): 
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acceso denegado. Se requieren privilegios de administrador institucional."
+        )
+    return usuario_actual

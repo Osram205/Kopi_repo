@@ -1,27 +1,28 @@
 # app/main.py
 from fastapi import FastAPI
-from app.data.database import engine, Base  # <-- CAMBIO: Importamos Base desde database directamente
-from app.data import models                   # Mantenemos esta línea para que SQLAlchemy lea las tablas
-from app.routers import auth, calificaciones, pagos, reservaciones, vehiculos, viajes
+from app.data.database import engine, Base
+from app.data import models
+from app.core.config import settings # <-- IMPORTACIÓN NUEVA
+from app.routers import auth, calificaciones, pagos, reservaciones, vehiculos, viajes, admin
 
-# CAMBIO: Usamos Base directamente
 Base.metadata.create_all(bind=engine)
 
-# Inicializamos la app con el nombre del proyecto
+# <-- CAMBIO: Usamos las variables centralizadas
 app = FastAPI(
-    title="API de Kopi - Carpooling UPQ",
+    title=settings.PROJECT_NAME,
     description="Sistema backend para la gestión de viajes compartidos",
-    version="1.0.0"
+    version=settings.VERSION
 )
 
-# Registramos nuestras rutas
 app.include_router(auth.router)
 app.include_router(vehiculos.router)
 app.include_router(viajes.router)
 app.include_router(reservaciones.router)
 app.include_router(pagos.router)
 app.include_router(calificaciones.router)
+app.include_router(admin.router)
 
 @app.get("/")
 def raiz():
-    return {"mensaje": "¡Bienvenido a la API de Kopi! El servidor está corriendo correctamente."}
+    # <-- CAMBIO: Actualizamos el mensaje de retorno
+    return {"mensaje": f"¡Bienvenido a {settings.PROJECT_NAME}! El servidor está corriendo correctamente."}

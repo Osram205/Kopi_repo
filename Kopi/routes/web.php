@@ -1,27 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ViajeWebController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// ==========================================
+// RUTAS DE LA APLICACIÓN WEB (CLIENTE)
+// ==========================================
 
-Route::get('/app', function () {
-    return view('welcome');
-});
+// Pantalla principal que carga los viajes desde FastAPI
+Route::get('/', [ViajeWebController::class, 'index'])->name('home');
 
-Route::get('/login', function () {
-    return view('auth');
-});
+// Pantallas de autenticación (las conectaremos después a FastAPI)
+Route::get('/login', function () { return view('auth', ['mode' => 'login']); })->name('login');
+Route::get('/registro', function () { return view('auth', ['mode' => 'registro']); })->name('registro');
 
-Route::get('/registro', function () {
-    return view('auth', ['mode' => 'registro']);
-});
+// Pantallas del conductor
+Route::get('/conductor', [ViajeWebController::class, 'create'])->name('conductor.create');
+Route::post('/conductor/viajes', [ViajeWebController::class, 'store'])->name('conductor.store');
 
-Route::get('/vehiculos/nuevo', function () {
-    return view('vehicle');
-});
-
-Route::get('/conductor', function () {
-    return view('driver');
-});
+Route::get('/vehiculos/nuevo', function () { return view('vehicle'); })->name('vehiculos.create');
