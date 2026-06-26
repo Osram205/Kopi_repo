@@ -55,6 +55,8 @@ class Usuario(Base):
     foto_credencial = Column(String(255), nullable=True)
     estatus_verificacion = Column(SQLEnum(EstatusVerificacion), default=EstatusVerificacion.pendiente)
     es_conductor = Column(Boolean, default=False)
+    fcm_token = Column(String(512), nullable=True)
+    es_admin = Column(Boolean, default=False, nullable=False)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

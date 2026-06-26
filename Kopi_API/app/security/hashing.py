@@ -1,7 +1,5 @@
-# app/security/hashing.py
 from passlib.context import CryptContext
 
-# Configuramos bcrypt como nuestro algoritmo de encriptación
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class Hash:
@@ -10,5 +8,6 @@ class Hash:
         return pwd_context.hash(password)
 
     @staticmethod
-    def verify(hashed_password, plain_password):
+    def verify(plain_password: str, hashed_password: str):
+        # Passlib exige estrictamente: (texto_plano, hash_encriptado)
         return pwd_context.verify(plain_password, hashed_password)

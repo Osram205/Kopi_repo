@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.data import models
 from app.models import reserva_schema
+from app.services.notificacion_service import NotificacionService
 
 class ReservacionService:
     @staticmethod
@@ -53,13 +54,21 @@ class ReservacionService:
         if request.estatus_reserva != "cancelado" and viaje.conductor_id != usuario.id: raise HTTPException(status_code=403, detail="Solo el conductor puede aceptar o rechazar reservaciones.")
 
         if request.estatus_reserva == "aceptado" and reservacion.estatus_reserva != models.EstatusReserva.aceptado:
-            if reservacion.asientos_solicitados > viaje.asientos_disponibles: raise HTTPException(status_code=422, detail="No hay suficientes asientos disponibles.")
+            if reservacion.asientos_solicitados > viaje.asientos_disponibles: 
+                raise HTTPException(status_code=422, detail="No hay suficientes asientos disponibles.")
+            
             viaje.asientos_disponibles -= reservacion.asientos_solicitados
-
+            pasajero = db.query(models.Usuario).filter(models.Usuario.id == reservacion.pasajero_id).first()
+            if pasajero and getattr(pasajero, 'fcm_token', None):
+                NotificacionService.notificar_reserva_aceptada(
+                    token_dispositivo=pasajero.fcm_token,
+                    conductor_nombre=usuario.nombre
+                )
         if request.estatus_reserva == "cancelado" and reservacion.estatus_reserva == models.EstatusReserva.aceptado:
             viaje.asientos_disponibles += reservacion.asientos_solicitados
 
         reservacion.estatus_reserva = models.EstatusReserva(request.estatus_reserva)
+        
         db.commit()
         db.refresh(reservacion)
         return reservacion

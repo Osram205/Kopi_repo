@@ -14,6 +14,11 @@ class VehiculoService:
 
     @staticmethod
     def crear(db: Session, request: vehiculos_schema.VehiculoCrear, usuario: models.Usuario):
+        if usuario.estatus_verificacion != 'aprobado':
+            raise HTTPException(
+                status_code=403, 
+                detail="Debes ser un conductor aprobado por la administración para registrar un vehículo."
+            )
         if db.query(models.Vehiculo).filter(models.Vehiculo.placas == request.placas).first():
             raise HTTPException(status_code=400, detail="Las placas ya están registradas.")
 

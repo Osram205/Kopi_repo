@@ -19,3 +19,11 @@ def listar_verificaciones_pendientes(db: Session = Depends(database.get_db)):
 def evaluar_alumno(usuario_id: int, accion: str, db: Session = Depends(database.get_db)):
     # accion debe ser ?accion=aprobado o ?accion=rechazado en la URL
     return AdminService.evaluar_verificacion(db, usuario_id, accion)
+
+@router.get("/metricas")
+def obtener_kpis(db: Session = Depends(database.get_db)):
+    return AdminService.obtener_metricas(db)
+
+@router.delete("/usuarios/{usuario_id}/suspender")
+def suspender_alumno(usuario_id: int, db: Session = Depends(database.get_db)):
+    return AdminService.suspender_usuario(db, usuario_id)

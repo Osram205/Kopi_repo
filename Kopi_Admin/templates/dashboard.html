@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kopi Admin - Analítica</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand fw-bold text-info">KOPI Centro de Control</span>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link active fw-bold" href="/dashboard">Cuadro de Mando</a>
+                <a class="nav-link" href="/usuarios">Control de Usuarios</a>
+            </div>
+            <a href="/logout" class="btn btn-sm btn-outline-light">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>Indicadores Clave de Rendimiento (KPIs)</h3>
+            <span class="badge bg-secondary p-2">Actualizado en Tiempo Real</span>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white p-3">
+                    <div class="text-muted text-uppercase small fw-bold">Comunidad Total</div>
+                    <h2 class="text-primary fw-bold mb-0">{{ metricas.get('usuarios_totales', 0) }}</h2>
+                    <small class="text-muted">Alumnos con cuenta activa</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white p-3">
+                    <div class="text-muted text-uppercase small fw-bold">Rutas Activas Hoy</div>
+                    <h2 class="text-success fw-bold mb-0">{{ metricas.get('viajes_activos', 0) }}</h2>
+                    <small class="text-muted">Conductores en circulación</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white p-3">
+                    <div class="text-muted text-uppercase small fw-bold">Ocupación Activa</div>
+                    <h2 class="text-info fw-bold mb-0">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
+                    <small class="text-muted">Asientos reservados confirmados</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7 mb-4">
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="card-title fw-bold text-muted mb-4">Demanda de Viajes por Día de la Semana</h5>
+                    <canvas id="graficaViajes" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+            <div class="col-md-5 mb-4">
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="card-title fw-bold text-muted mb-4">Distribución del Ecosistema</h5>
+                    <canvas id="graficaDistribucion" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Gráfica de Barras
+        const ctxViajes = document.getElementById('graficaViajes').getContext('2d');
+        const viajesActivos = parseInt("{{ metricas.get('viajes_activos', 0) }}") || 0;
+
+        new Chart(ctxViajes, {
+            type: 'bar',
+            data: {
+                labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+                datasets: [{
+                    label: 'Viajes Completados',
+                    data: [34, 45, viajesActivos + 20, viajesActivos, 12],
+                    backgroundColor: 'rgba(25, 135, 84, 0.75)',
+                    borderColor: 'rgb(25, 135, 84)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+
+        // 2. Gráfica de Dona
+        const ctxDistribucion = document.getElementById('graficaDistribucion').getContext('2d');
+        new Chart(ctxDistribucion, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pasajeros Activos', 'Lugares Ocupados'],
+                datasets: [{
+                    data: [
+                        parseInt("{{ metricas.get('usuarios_totales', 0) }}") || 0,
+                        parseInt("{{ metricas.get('alumnos_transportandose', 0) }}") || 0
+                    ],
+                    backgroundColor: ['#0d6efd', '#0dcaf0'],
+                    hoverOffset: 4
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+</body>
+
+</html>

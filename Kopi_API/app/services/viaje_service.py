@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
 from datetime import datetime
+from sqlalchemy import func
+import struct
 
 from app.data import models
 from app.models import viaje_schema
@@ -25,13 +27,18 @@ class ViajeService:
 
     @staticmethod
     def obtener(db: Session, viaje_id: int):
-        viaje = db.query(models.Viaje).options(joinedload(models.Viaje.paradas)).filter(
+        viaje = db.query(models.Viaje).filter(
             models.Viaje.id == viaje_id,
-            models.Viaje.deleted_at.is_(None),
+            models.Viaje.deleted_at.is_(None)
         ).first()
 
         if not viaje:
             raise HTTPException(status_code=404, detail="Viaje no encontrado.")
+        for parada in viaje.paradas:
+            if isinstance(parada.coordenadas, bytes) and len(parada.coordenadas) >= 25:
+                lon, lat = struct.unpack('<dd', parada.coordenadas[9:25])
+                parada.coordenadas = f"{lat},{lon}"
+
         return viaje
 
     @staticmethod
@@ -41,6 +48,7 @@ class ViajeService:
                 status_code=403, 
                 detail="Tu cuenta aún no está verificada. No puedes publicar viajes hasta que se valide tu credencial institucional."
             )
+        
         # 1. Validaciones
         vehiculo = db.query(models.Vehiculo).filter(
             models.Vehiculo.id == request.vehiculo_id,
@@ -57,12 +65,27 @@ class ViajeService:
         data = request.model_dump(exclude={"paradas"})
         viaje = models.Viaje(**data, conductor_id=usuario.id)
         db.add(viaje)
-        db.flush()
+        db.flush() # flush() genera el viaje.id temporal necesario para las paradas
 
-        # 3. Inserción de Paradas
+        # 3. Inserción de Paradas (Corregido para GEOMETRY / POINT)
         for parada in request.paradas:
-            db.add(models.ParadaViaje(**parada.model_dump(), viaje_id=viaje.id))
-
+            # Separar "latitud,longitud"
+            partes = parada.coordenadas.split(',')
+            lat = partes[0].strip()
+            lon = partes[1].strip()
+            
+            # Formatear para MySQL: POINT(longitud latitud)
+            punto_espacial = func.ST_GeomFromText(f"POINT({lon} {lat})")
+            
+            # Volcar datos excluyendo el string original e inyectando la variable espacial
+            parada_data = parada.model_dump(exclude={"coordenadas"})
+            nueva_parada = models.ParadaViaje(
+                **parada_data, 
+                coordenadas=punto_espacial, 
+                viaje_id=viaje.id
+            )
+            db.add(nueva_parada)
+            
         usuario.es_conductor = True
         db.commit()
         db.refresh(viaje)
