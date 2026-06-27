@@ -53,7 +53,7 @@ class Usuario(Base):
     contrasena = Column(String(255), nullable=False)
     telefono = Column(String(15), nullable=False)
     foto_credencial = Column(String(255), nullable=True)
-    estatus_verificacion = Column(SQLEnum(EstatusVerificacion), default=EstatusVerificacion.pendiente)
+    estatus_verificacion = Column(String(20), default="pendiente")
     es_conductor = Column(Boolean, default=False)
     fcm_token = Column(String(512), nullable=True)
     es_admin = Column(Boolean, default=False, nullable=False)

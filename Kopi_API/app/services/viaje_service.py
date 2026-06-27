@@ -24,7 +24,6 @@ class ViajeService:
             query = query.filter(models.Viaje.fecha_salida == fecha_salida)
 
         return query.order_by(models.Viaje.fecha_salida, models.Viaje.hora_salida).all()
-
     @staticmethod
     def obtener(db: Session, viaje_id: int):
         viaje = db.query(models.Viaje).filter(
@@ -34,13 +33,9 @@ class ViajeService:
 
         if not viaje:
             raise HTTPException(status_code=404, detail="Viaje no encontrado.")
-        for parada in viaje.paradas:
-            if isinstance(parada.coordenadas, bytes) and len(parada.coordenadas) >= 25:
-                lon, lat = struct.unpack('<dd', parada.coordenadas[9:25])
-                parada.coordenadas = f"{lat},{lon}"
 
+        # Ya no hay traductor manual aquí. Pydantic lo hará automático.
         return viaje
-
     @staticmethod
     def crear(db: Session, request: viaje_schema.ViajeCrear, usuario: models.Usuario):
         if getattr(usuario, 'estatus_verificacion', 'pendiente') != 'aprobado':

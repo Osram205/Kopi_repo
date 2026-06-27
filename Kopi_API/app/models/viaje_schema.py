@@ -1,13 +1,20 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,field_validator
 from typing import List, Optional
 from datetime import date, time
+import struct
 
 class ParadaBase(BaseModel):
     nombre_parada: str
     coordenadas: str
     orden: int
+    @field_validator('coordenadas', mode='before')
+    @classmethod
+    def decodificar_espacial(cls, valor):
+        if isinstance(valor, bytes) and len(valor) >= 25:
+            lon, lat = struct.unpack('<dd', valor[9:25])
+            return f"{lat},{lon}"
+        return valor
 
-# Lo que envía el conductor para publicar un viaje
 class ViajeCrear(BaseModel):
     vehiculo_id: int
     origen: str
@@ -16,7 +23,7 @@ class ViajeCrear(BaseModel):
     hora_salida: time
     asientos_disponibles: int
     costo_por_asiento: float
-    paradas: List[ParadaBase] # Array de paradas que se enviarán junto con el viaje
+    paradas: List[ParadaBase] 
 
 class ViajeActualizar(BaseModel):
     origen: Optional[str] = None
