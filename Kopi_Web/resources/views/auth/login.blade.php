@@ -62,7 +62,7 @@
                                 @enderror
                             </div>
 
-                            <div class="form-floating mb-4">
+                            <div class="form-floating mb-2">
                                 <input type="password" 
                                        name="contrasena" 
                                        class="form-control @error('contrasena') is-invalid @enderror" 
@@ -75,9 +75,23 @@
                                 @enderror
                             </div>
 
+                            <div class="text-end mb-4">
+                                <a href="{{ route('password.request') }}" class="text-decoration-none small fw-bold text-primary">¿Olvidaste tu contraseña?</a>
+                            </div>
+
                             <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm mb-3" type="submit">
                                 Ingresar al Sistema
                             </button>
+
+                            <div class="d-flex align-items-center my-4">
+                                <hr class="flex-grow-1 text-muted" style="opacity: 0.2;">
+                                <span class="px-3 text-muted small text-uppercase tracking-wider">o</span>
+                                <hr class="flex-grow-1 text-muted" style="opacity: 0.2;">
+                            </div>
+
+                            <a href="{{ route('registro') }}" class="btn btn-outline-dark btn-lg w-100 fw-bold shadow-sm mb-3">
+                                Crear nueva cuenta
+                            </a>
 
                             <div class="text-center mt-3">
                                 <small class="text-muted">Exclusivo para la comunidad universitaria</small>

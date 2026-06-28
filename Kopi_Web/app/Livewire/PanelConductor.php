@@ -3,15 +3,22 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithFileUploads; // <- IMPORTANTE: Para habilitar subida de archivos
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 
 class PanelConductor extends Component
 {
-    // Estatus del usuario: puede ser nulo, 'solicitado' o 'aprobado'
+    use WithFileUploads; // Trait requerido por Livewire
+
     public $estatusVerificacion = ''; 
     
-    // Propiedades para el formulario del vehículo
+    // Propiedades del Formulario de Postulación (Documentos)
+    public $foto_credencial;
+    public $foto_licencia;
+    public $tarjeta_circulacion;
+
+    // Propiedades del Formulario del Vehículo (Se mantienen igual)
     public $marca, $modelo, $placas, $color, $asientos_totales;
 
     public function mount()
@@ -22,32 +29,63 @@ class PanelConductor extends Component
     public function obtenerEstatusUsuario()
     {
         $token = Session::get('jwt_token');
-        // Consultamos el perfil del usuario actual en FastAPI para conocer su estatus real
         $response = Http::withToken($token)->get(env('FASTAPI_URL') . '/usuarios/perfil');
         
         if ($response->successful()) {
-            // Guardamos el estatus de verificación que viene de MySQL (ej. 'solicitado', 'aprobado' o 'pendiente')
             $this->estatusVerificacion = $response->json()['estatus_verificacion'] ?? '';
         }
     }
 
-    // ACCIÓN 1: LEVANTAR LA MANO PARA SER CONDUCTOR
+    // ACCIÓN 1: ENVIAR SOLICITUD DE CONDUCCIÓN CON ARCHIVOS ADJUNTOS
     public function enviarSolicitudConduccion()
     {
+        // 1. LA VALIDACIÓN SE HACE AQUÍ, UNA SOLA VEZ AL INICIO.
+        // Si una imagen pesa más de 2MB, Laravel detiene todo aquí y muestra el error.
+        $this->validate([
+            'foto_credencial' => 'required|image|max:10230',
+            'foto_licencia' => 'required|image|max:10230',
+            'tarjeta_circulacion' => 'required|image|max:10230',
+        ]);
+
         $token = Session::get('jwt_token');
-        $response = Http::withToken($token)->put(env('FASTAPI_URL') . '/usuarios/solicitar-conductor');
+
+        // Construimos la petición usando el método ->get() de Livewire para extraer los binarios de forma segura
+        $response = Http::withToken($token)
+            ->attach(
+                'foto_credencial', 
+                $this->foto_credencial->get(), 
+                $this->foto_credencial->getClientOriginalName()
+            )
+            ->attach(
+                'foto_licencia', 
+                $this->foto_licencia->get(), 
+                $this->foto_licencia->getClientOriginalName()
+            )
+            ->attach(
+                'tarjeta_circulacion', 
+                $this->tarjeta_circulacion->get(), 
+                $this->tarjeta_circulacion->getClientOriginalName()
+            )
+            ->put(env('FASTAPI_URL') . '/usuarios/solicitar-conductor'); // Enviamos por PUT a FastAPI
 
         if ($response->successful()) {
-            session()->flash('success', 'Tu solicitud ha sido enviada. Espera la validación del administrador.');
-            $this->obtenerEstatusUsuario(); // Actualiza la pantalla dinámicamente
+            session()->flash('success', 'Tu postulación y documentos han sido enviados al comité administrador.');
+            $this->obtenerEstatusUsuario();
         } else {
-            session()->flash('error', 'No se pudo procesar la solicitud.');
+            $error = $response->json()['detail'] ?? 'Error al subir los documentos de verificación.';
+            session()->flash('error', $error);
         }
     }
 
-    // ACCIÓN 2: ALTA DEL VEHÍCULO (SOLO SI YA ESTÁ APROBADO)
+    // ACCIÓN 2: REGISTRAR VEHÍCULO (Se queda exactamente igual)
     public function registrarVehiculo()
     {
+        // 1. Refuerzo local: Si en la sesión actual el estatus no es aprobado, bloqueamos el envío
+        if ($this->estatusVerificacion !== 'aprobado') {
+            session()->flash('error', 'Acceso denegado. No tienes permisos de conductor autorizado.');
+            return;
+        }
+
         $this->validate([
             'marca' => 'required|string',
             'modelo' => 'required|string',
@@ -65,13 +103,16 @@ class PanelConductor extends Component
             'asientos_totales' => (int)$this->asientos_totales,
         ];
 
+        // Enviamos la petición a FastAPI
         $response = Http::withToken($token)->post(env('FASTAPI_URL') . '/vehiculos', $payload);
 
         if ($response->successful()) {
-            session()->flash('success', '¡Vehículo registrado con éxito! Ya puedes publicar viajes.');
-            return redirect()->route('viajes.conductor'); // Te mandaría a gestionar tus rutas
+            session()->flash('success', '¡Vehículo registrado con éxito! Tu perfil de conductor está activo.');
+            return redirect()->route('viajes.index'); 
         } else {
-            session()->flash('error', $response->json()['detail'] ?? 'Error al dar de alta el coche.');
+            // Atrapamos el error 403 de FastAPI o cualquier otra falla de validación
+            $error = $response->json()['detail'] ?? 'Error al dar de alta el coche.';
+            session()->flash('error', $error);
         }
     }
 

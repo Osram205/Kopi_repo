@@ -57,6 +57,9 @@ class Usuario(Base):
     es_conductor = Column(Boolean, default=False)
     fcm_token = Column(String(512), nullable=True)
     es_admin = Column(Boolean, default=False, nullable=False)
+    foto_licencia = Column(String(255), nullable=True)
+    tarjeta_circulacion = Column(String(255), nullable=True)
+    token_recuperacion = Column(String(100), nullable=True)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

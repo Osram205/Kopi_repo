@@ -45,10 +45,46 @@ class AuthController extends Controller
         }
     }
 
+    public function showRegistro()
+    {
+        return view('auth.registro');
+    }
+
+    // Procesa el formulario de registro contra FastAPI
+    public function procesarRecuperacion(Request $request)
+    {
+        $request->validate([
+            'correo_institucional' => 'required|email',
+            'matricula' => 'required|string',
+            'nueva_contrasena' => 'required|string|min:6'
+        ]);
+
+        try {
+            $response = Http::post(env('FASTAPI_URL') . '/auth/restablecer-password', [
+                'correo_institucional' => $request->correo_institucional,
+                'matricula' => $request->matricula,
+                'nueva_contrasena' => $request->nueva_contrasena
+            ]);
+
+            if ($response->successful()) {
+                return redirect()->route('login')->with('success', '¡Tu contraseña ha sido restablecida! Ya puedes iniciar sesión.');
+            }
+
+            $mensajeError = $response->json()['detail'] ?? 'Error al restablecer la contraseña. Verifica tus datos.';
+            return back()->with('error', $mensajeError)->withInput();
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error de conexión con el servidor central.')->withInput();
+        }
+    }
+
+    // Muestra la vista de Recuperar Contraseña (Plantilla)
     // Cierra la sesión borrando el Token
     public function logout()
     {
         Session::forget('jwt_token');
         return redirect()->route('login');
     }
+
+    
 }

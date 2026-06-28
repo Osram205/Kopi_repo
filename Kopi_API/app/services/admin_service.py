@@ -7,9 +7,22 @@ class AdminService:
     def listar_usuarios_pendientes(db: Session):
         """Lista a todos los alumnos que han subido credencial pero no han sido aprobados."""
         return db.query(models.Usuario).filter(
-            models.Usuario.estatus_verificacion == 'pendiente',
+            models.Usuario.estatus_verificacion == 'solicitado',
             models.Usuario.deleted_at.is_(None)
         ).all()
+    
+    @staticmethod
+    def listar_directorio_conductores(db: Session, estatus: str = None):
+        """Lista a los alumnos evaluados con opción de filtrar por estatus."""
+        query = db.query(models.Usuario).filter(models.Usuario.deleted_at.is_(None))
+        
+        if estatus in ['aprobado', 'rechazado']:
+            query = query.filter(models.Usuario.estatus_verificacion == estatus)
+        else:
+            # Si no viene filtro, muestra ambos
+            query = query.filter(models.Usuario.estatus_verificacion.in_(['aprobado', 'rechazado']))
+            
+        return query.all()
 
     @staticmethod
     def evaluar_verificacion(db: Session, usuario_id: int, accion: str):
@@ -56,3 +69,25 @@ class AdminService:
         db.commit()
         
         return {"mensaje": f"El usuario {usuario.matricula} ha sido suspendido y expulsado del sistema."}
+    
+    @staticmethod
+    def revocar_privilegios_conduccion(db: Session, usuario_id: int):
+        """Le quita los permisos de conductor a un alumno, regresándolo a estatus de pasajero."""
+        alumno = db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
+        if not alumno:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado.")
+
+        # Modificamos los campos clave para retirarle el rol de conductor
+        alumno.estatus_verificacion = 'rechazado'
+        alumno.es_conductor = False
+        
+        # Opcional: Cancelar sus viajes programados activos para que no queden rutas fantasma
+        db.query(models.Viaje).filter(
+            models.Viaje.conductor_id == usuario_id,
+            models.Viaje.estatus == models.EstatusViaje.programado
+        ).update({models.Viaje.estatus: models.EstatusViaje.cancelado}, synchronize_session=False)
+
+        db.commit()
+        db.refresh(alumno)
+        
+        return {"mensaje": f"Permisos de conducción revocados con éxito para el alumno {alumno.matricula}."}

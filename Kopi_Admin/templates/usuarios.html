@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Kopi Admin - Gestión Operativa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <span class="navbar-brand fw-bold text-info">KOPI Centro de Control</span>
             <div class="navbar-nav me-auto">
                 <a class="nav-link" href="/dashboard">Cuadro de Mando</a>
-                <a class="nav-link active fw-bold" href="/usuarios">Control de Usuarios</a>
+                <a class="nav-link active fw-bold" href="/usuarios">Solicitudes Pendientes</a>
+                <a class="nav-link" href="/directorio">Directorio General</a>
             </div>
             <a href="/logout" class="btn btn-sm btn-outline-light">Cerrar Sesión</a>
         </div>
@@ -19,14 +22,14 @@
 
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm">
-                  {{ message }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
 
         <div class="mb-4">
@@ -45,31 +48,46 @@
                             <th class="ps-4">Matrícula</th>
                             <th>Nombre Completo</th>
                             <th>Correo Institucional</th>
+                            <th>Documentos Adjuntos</th>
                             <th class="text-center">Acciones Ejecutivas</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if alumnos %}
-                            {% for alumno in alumnos %}
-                            <tr>
-                                <td class="align-middle ps-4 fw-bold text-primary">{{ alumno.matricula }}</td>
-                                <td class="align-middle">{{ alumno.nombre }}</td>
-                                <td class="align-middle text-muted">{{ alumno.correo_institucional }}</td>
-                                <td class="text-center align-middle">
-                                    <form action="/evaluar/{{ alumno.id }}" method="POST" class="d-inline">
-                                        <input type="hidden" name="accion" value="aprobado">
-                                        <button type="submit" class="btn btn-success btn-sm px-3 fw-bold shadow-sm">Aprobar</button>
-                                    </form>
-                                    <form action="/evaluar/{{ alumno.id }}" method="POST" class="d-inline">
-                                        <input type="hidden" name="accion" value="rechazado">
-                                        <button type="submit" class="btn btn-warning btn-sm px-3 fw-bold shadow-sm">Rechazar</button>
-                                    </form>
-                                    <form action="/suspender/{{ alumno.id }}" method="POST" class="d-inline" onsubmit="return confirm('¿Confirmas la expulsión definitiva del alumno del sistema?');">
-                                        <button type="submit" class="btn btn-danger btn-sm px-3 fw-bold shadow-sm">Suspender</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                        {% for alumno in alumnos %}
+                        <tr>
+                            <td class="align-middle ps-4 fw-bold text-primary">{{ alumno.matricula }}</td>
+                            <td class="align-middle">{{ alumno.nombre }}</td>
+                            <td class="align-middle text-muted">{{ alumno.correo_institucional }}</td>
+                            <td class="align-middle">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="http://127.0.0.1:8000/static/uploads/{{ alumno.foto_credencial }}"
+                                        target="_blank" class="btn btn-outline-secondary">🪪 Credencial</a>
+                                    <a href="http://127.0.0.1:8000/static/uploads/{{ alumno.foto_licencia }}"
+                                        target="_blank" class="btn btn-outline-secondary">🪪 Licencia</a>
+                                    <a href="http://127.0.0.1:8000/static/uploads/{{ alumno.tarjeta_circulacion }}"
+                                        target="_blank" class="btn btn-outline-secondary">📄 Tarjeta Circ.</a>
+                                </div>
+                            </td>
+                            <td class="text-center align-middle">
+                                <form action="/evaluar/{{ alumno.id }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="accion" value="aprobado">
+                                    <button type="submit"
+                                        class="btn btn-success btn-sm px-3 fw-bold shadow-sm">Aprobar</button>
+                                </form>
+                                <form action="/evaluar/{{ alumno.id }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="accion" value="rechazado">
+                                    <button type="submit"
+                                        class="btn btn-warning btn-sm px-3 fw-bold shadow-sm">Rechazar</button>
+                                </form>
+                                <form action="/suspender/{{ alumno.id }}" method="POST" class="d-inline"
+                                    onsubmit="return confirm('¿Confirmas la expulsión definitiva del alumno del sistema?');">
+                                    <button type="submit"
+                                        class="btn btn-danger btn-sm px-3 fw-bold shadow-sm">Suspender</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
                         {% else %}
                         <tr>
                             <td colspan="4" class="text-center py-5 text-muted">
@@ -84,4 +102,5 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

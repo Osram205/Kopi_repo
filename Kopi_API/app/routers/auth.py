@@ -19,3 +19,11 @@ def login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
         contrasena=request.password
     )
     return AuthService.login(db, login_data)
+
+@router.post("/verificar-identidad")
+def verificar_identidad(request: auth_schema.VerificarIdentidad, db: Session = Depends(database.get_db)):
+    return AuthService.verificar_identidad_recuperacion(db, request)
+
+@router.post("/restablecer-con-token")
+def restablecer_con_token(request: auth_schema.RestablecerConToken, db: Session = Depends(database.get_db)):
+    return AuthService.restablecer_password_con_token(db, request)

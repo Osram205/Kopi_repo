@@ -27,3 +27,11 @@ def obtener_kpis(db: Session = Depends(database.get_db)):
 @router.delete("/usuarios/{usuario_id}/suspender")
 def suspender_alumno(usuario_id: int, db: Session = Depends(database.get_db)):
     return AdminService.suspender_usuario(db, usuario_id)
+
+@router.get("/usuarios/directorio")
+def obtener_directorio(estatus: str = None, db: Session = Depends(database.get_db)):
+    return AdminService.listar_directorio_conductores(db, estatus)
+
+@router.put("/usuarios/{usuario_id}/revocar")
+def revocar_conduccion(usuario_id: int, db: Session = Depends(database.get_db)):
+    return AdminService.revocar_privilegios_conduccion(db, usuario_id)

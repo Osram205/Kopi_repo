@@ -37,3 +37,11 @@ class UsuarioRespuesta(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class VerificarIdentidad(BaseModel):
+    correo_institucional: str
+    matricula: str
+
+class RestablecerConToken(BaseModel):
+    token: str
+    nueva_contrasena: str
