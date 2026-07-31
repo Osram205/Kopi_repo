@@ -23,6 +23,8 @@ services:
     restart: unless-stopped
     depends_on:
       - kopi_db
+    env_file:
+      - .env
     environment:
       - SQLALCHEMY_DATABASE_URL=mysql+pymysql://root:${DB_ROOT_PASSWORD:-Valeos0430!}@kopi_db:3306/Kopi
     networks:
@@ -37,6 +39,8 @@ services:
     image: kopi-web:1.0.0
     container_name: kopi_web_app
     restart: unless-stopped
+    env_file:
+      - .env
     volumes:
       - web_data:/var/www/html
     networks:
@@ -50,6 +54,8 @@ services:
     image: kopi-admin:1.0.0
     container_name: kopi_admin_app
     restart: unless-stopped
+    env_file:
+      - .env
     networks:
       - kopi_public
 

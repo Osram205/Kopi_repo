@@ -1,40 +1,36 @@
-# 1. Imagen Base Fija: Usamos una versión específica de PHP FPM
-FROM php:8.2-fpm
+# Etapa 1: Compilar assets frontend con Node y Vite
+FROM node:20.10.0-alpine AS frontend-builder
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+COPY . .
+RUN npm run build
 
-# Directorio de trabajo
-WORKDIR /var/www/html
+# Etapa 2: Instalar dependencias PHP con Composer
+FROM composer:2.6.5 AS vendor-builder
+WORKDIR /app
 
-# 2. Dependencias del Sistema Operativo:
-# Actualizamos repositorios, instalamos dependencias críticas y limpiamos caché de apt
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar dependencias del sistema requeridas por Composer (Solución de exit code: 2)
+RUN apk update && apk add --no-cache git unzip zip zlib-dev libzip-dev
+RUN docker-php-ext-install zip
 
-# 3. Extensiones Nativas de PHP:
-# Instalamos y habilitamos pdo_mysql, mbstring, pcntl, bcmath y gd
-RUN docker-php-ext-install pdo_mysql mbstring pcntl bcmath gd
-
-# 4. Ejecución de Composer:
-# Obtenemos el binario de Composer versión 2.6
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
-
-# Copiamos primero composer.json y composer.lock para aprovechar el caché de Docker
 COPY composer.json composer.lock ./
-
-# Instalamos las dependencias con verbosidad y la ignorando requerimientos de plataforma
-RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction -v --ignore-platform-reqs
-
-# Copiamos el resto del proyecto
+# Ignoramos dependencias de desarrollo y scripts para mayor seguridad en la imagen
+RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction --ignore-platform-reqs
 COPY . .
 
-# Ajustamos permisos (típico para aplicaciones como Laravel)
+# Etapa 3: Imagen Final con PHP-FPM
+FROM php:8.2.14-fpm-alpine
+WORKDIR /var/www/html
+
+# Instalar extensiones necesarias de PHP (pdo_mysql crítico para Kopi_Web)
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Copiamos código y dependencias construidas en etapas anteriores
+COPY --from=vendor-builder /app /var/www/html
+COPY --from=frontend-builder /app/public/build /var/www/html/public/build
+
+# Permisos para el framework
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 9000

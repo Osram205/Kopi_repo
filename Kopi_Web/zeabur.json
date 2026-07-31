@@ -1,0 +1,6 @@
+{
+  "build": {
+    "command": "composer install --no-dev --optimize-autoloader",
+    "public_dir": "public"
+  }
+}
