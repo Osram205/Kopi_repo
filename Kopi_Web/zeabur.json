@@ -1,6 +1,9 @@
 {
   "build": {
     "command": "composer install --no-dev --optimize-autoloader && npm install && npm run build",
-    "public_dir": "public"
+    "public_dir": "public",
+    "env": {
+      "NODE_VERSION": "22.12.0"
+    }
   }
 }
