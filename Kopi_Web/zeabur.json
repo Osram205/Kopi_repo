@@ -1,6 +1,6 @@
 {
   "build": {
-    "command": "composer install --no-dev --optimize-autoloader",
+    "command": "composer install --no-dev --optimize-autoloader && npm install && npm run build",
     "public_dir": "public"
   }
 }
