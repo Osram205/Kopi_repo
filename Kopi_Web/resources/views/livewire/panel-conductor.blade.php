@@ -21,7 +21,7 @@
         
         <!-- Left Column: Driver Status -->
         <div class="md:col-span-5 space-y-6">
-            @if(session('es_conductor') == false && session('estatus_verificacion') == null)
+            @if(session('es_conductor') == false && (session('estatus_verificacion') == null || session('estatus_verificacion') == 'pendiente'))
                 <div class="bg-black border-4 border-gray-900">
                     <div class="bg-primary-500 p-6 flex items-center justify-between border-b-4 border-black">
                         <h4 class="font-black text-black text-xl uppercase tracking-widest">VUÉLVETE CONDUCTOR</h4>
@@ -63,7 +63,7 @@
                         </form>
                     </div>
                 </div>
-            @elseif(session('estatus_verificacion') == 'pendiente')
+            @elseif(session('estatus_verificacion') == 'solicitado')
                 <div class="bg-black border-4 border-primary-500 p-8 text-center relative">
                     <div class="absolute top-0 left-0 w-full h-2 bg-primary-500"></div>
                     <div class="w-16 h-16 bg-black text-primary-500 border-4 border-primary-500 flex items-center justify-center mx-auto mb-4 text-2xl font-black">⏳</div>

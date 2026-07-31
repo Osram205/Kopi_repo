@@ -5,10 +5,9 @@ from app.data import models
 class AdminService:
     @staticmethod
     def listar_usuarios_pendientes(db: Session):
-        """Lista a todos los alumnos que han subido credencial pero no han sido aprobados."""
-        # 🔥 FIX 1: Cambiamos 'solicitado' por 'pendiente' según el Enum
+        """Lista a todos los alumnos que han solicitado ser conductores (han subido sus 4 documentos)."""
         return db.query(models.Usuario).filter(
-            models.Usuario.estatus_verificacion == 'pendiente',
+            models.Usuario.estatus_verificacion == 'solicitado',
             models.Usuario.deleted_at.is_(None)
         ).all()
     

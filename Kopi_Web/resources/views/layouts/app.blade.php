@@ -49,12 +49,14 @@
                             
                             <a href="{{ route('viajes.mios') }}" class="block px-5 py-3 text-sm font-bold text-gray-300 hover:bg-primary-500 hover:text-black transition-colors uppercase tracking-widest">Mis viajes</a>
                             
+                            <div class="border-t-2 border-gray-800 my-1"></div>
+                            <p class="px-5 py-2 text-xs font-black text-accent-500 uppercase tracking-widest">Conductor</p>
                             @if(session('es_conductor') == true || session('estatus_verificacion') == 'aprobado')
-                                <div class="border-t-2 border-gray-800 my-1"></div>
-                                <p class="px-5 py-2 text-xs font-black text-accent-500 uppercase tracking-widest">Conductor</p>
                                 <a href="{{ route('conductor.panel') }}" class="block px-5 py-2 text-sm font-bold text-gray-300 hover:bg-primary-500 hover:text-black transition-colors uppercase">Vehículos</a>
                                 <a href="{{ route('viajes.publicar') }}" class="block px-5 py-2 text-sm font-bold text-gray-300 hover:bg-primary-500 hover:text-black transition-colors uppercase">Publicar ruta</a>
                                 <a href="{{ route('reservaciones.gestionar') }}" class="block px-5 py-2 text-sm font-bold text-gray-300 hover:bg-primary-500 hover:text-black transition-colors uppercase">Solicitudes</a>
+                            @else
+                                <a href="{{ route('conductor.panel') }}" class="block px-5 py-2 text-sm font-bold text-gray-300 hover:bg-primary-500 hover:text-black transition-colors uppercase">Solicitar ser conductor</a>
                             @endif
                             
                             <div class="border-t-2 border-gray-800 my-1"></div>
