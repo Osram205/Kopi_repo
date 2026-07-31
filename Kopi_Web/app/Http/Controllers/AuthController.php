@@ -73,6 +73,7 @@ class AuthController extends Controller
             // 2. Enviamos los datos a FastAPI (sin las imágenes)
             // Forzar HTTP/1.1 y deshabilitar "Expect: 100-continue" para evitar el bug de cURL (error 56) en Windows XAMPP
             $response = Http::timeout(60)
+                ->asForm()
                 ->withOptions([
                     'version' => 1.1,
                     'headers' => ['Expect' => '']
