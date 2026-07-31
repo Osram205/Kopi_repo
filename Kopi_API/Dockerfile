@@ -3,11 +3,8 @@ FROM python:3.11.7-slim
 # Establecemos el directorio de trabajo
 WORKDIR /app
 
-# Instalamos dependencias del sistema requeridas para pytesseract y criptografía
+# Ya no instalamos tesseract-ocr ni libgl1 porque el OCR fue desactivado
 RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-spa \
-    libgl1-mesa-glx \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 

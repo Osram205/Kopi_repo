@@ -46,7 +46,7 @@
             </div>
 
             <div class="p-8">
-                <form action="{{ route('registro.post') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form action="{{ route('registro.post') }}" method="POST" class="space-y-6">
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -95,32 +95,15 @@
                                class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-6">
                         <div>
                             <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">CREAR CONTRASEÑA</label>
                             <input type="password" name="contrasena" placeholder="MÍN. 6 CARACTERES" required
                                    class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         </div>
-                        <div>
-                            <!-- Placeholder to keep grid balanced, or we can just make password full width. Let's make password full width. -->
-                        </div>
                     </div>
                     
-                    <div class="border-t-4 border-gray-900 my-4 pt-4">
-                        <label class="block text-sm font-black text-primary-500 mb-4 uppercase tracking-wider text-center">FOTOS DE TU CREDENCIAL</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-black text-gray-400 mb-2 uppercase tracking-wider">FOTO FRONTAL (DONDE SALE TU ROSTRO)</label>
-                                <input type="file" name="foto_credencial_frente" accept="image/*" required
-                                       class="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-sm file:font-black file:bg-gray-900 file:text-primary-500 hover:file:bg-black file:uppercase file:cursor-pointer border-4 border-gray-800 focus:border-primary-500 transition-colors mt-1">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-black text-gray-400 mb-2 uppercase tracking-wider">FOTO TRASERA (DONDE VIENE TU MATRÍCULA)</label>
-                                <input type="file" name="foto_credencial_trasera" accept="image/*" required
-                                       class="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-sm file:font-black file:bg-gray-900 file:text-primary-500 hover:file:bg-black file:uppercase file:cursor-pointer border-4 border-gray-800 focus:border-primary-500 transition-colors mt-1">
-                            </div>
-                        </div>
-                    </div>
+
 
                     <div class="pt-4">
                         <button type="submit" class="w-full bg-primary-500 text-black font-black text-lg py-5 hover:bg-white hover:text-black transition-all active:translate-y-1 uppercase border-b-4 border-orange-600 hover:border-gray-400">

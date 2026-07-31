@@ -64,26 +64,19 @@ class AuthController extends Controller
             'carrera' => 'required|string|max:100',
             'telefono' => 'required|string|max:15',
             'correo_institucional' => 'required|email|ends_with:@upq.edu.mx',
-            'contrasena' => 'required|string|min:6',
-            'foto_credencial_frente' => 'required|image|max:10240',
-            'foto_credencial_trasera' => 'required|image|max:10240'
+            'contrasena' => 'required|string|min:6'
         ], [
             'correo_institucional.ends_with' => 'Debes usar tu correo institucional (@upq.edu.mx).'
         ]);
 
         try {
-            // 2. Enviamos los datos a FastAPI usando attach() para enviar como form-data
-            $foto_frente = $request->file('foto_credencial_frente');
-            $foto_trasera = $request->file('foto_credencial_trasera');
-            
+            // 2. Enviamos los datos a FastAPI (sin las imágenes)
             // Forzar HTTP/1.1 y deshabilitar "Expect: 100-continue" para evitar el bug de cURL (error 56) en Windows XAMPP
             $response = Http::timeout(60)
                 ->withOptions([
                     'version' => 1.1,
                     'headers' => ['Expect' => '']
                 ])
-                ->attach('foto_credencial_frente', file_get_contents($foto_frente->getRealPath()), $foto_frente->getClientOriginalName())
-                ->attach('foto_credencial_trasera', file_get_contents($foto_trasera->getRealPath()), $foto_trasera->getClientOriginalName())
                 ->post(config('services.fastapi.url') . '/auth/registro', [
                     'nombre' => $request->nombre,
                     'apellidos' => $request->apellidos,

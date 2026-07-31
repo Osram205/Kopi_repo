@@ -88,12 +88,7 @@ def solicitar_ser_conductor(
         
         imagen_bytes = archivo.file.read()
         
-        # Validación OCR para Licencia
-        if columna_db == "foto_licencia":
-            from app.services.ocr_service import OCRService
-            if not OCRService.validar_licencia(imagen_bytes, usuario_actual.nombre):
-                raise HTTPException(status_code=400, detail="La licencia no pudo ser validada. Asegúrate de que tu nombre sea legible.")
-                
+        # Validación OCR deshabilitada
         # Guardamos el flujo binario en el disco duro
         with open(ruta_final, "wb") as buffer:
             buffer.write(imagen_bytes)

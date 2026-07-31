@@ -8,14 +8,11 @@ bcrypt==3.2.2
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.6
 pillow==10.1.0
-pytesseract==0.3.10
+
 httpx==0.25.2
 firebase-admin==6.3.0
 pydantic-settings==2.1.0
 stripe==7.7.0
 email-validator==2.1.0.post1
 prometheus-fastapi-instrumentator==6.1.0
-numpy<2.0.0
-opencv-python-headless==4.8.1.78
-thefuzz==0.20.0
-python-Levenshtein==0.23.0
+
