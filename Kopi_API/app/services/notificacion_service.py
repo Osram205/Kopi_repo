@@ -1,11 +1,11 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
-import os
+from app.core.config import settings
 
 # 1. Inicializar la conexión con Firebase
 # Nota: Debes descargar tu archivo JSON de credenciales desde la consola de Firebase 
 # (Configuración del proyecto > Cuentas de servicio) y guardarlo en la raíz de Kopi_API
-ruta_credenciales = os.getenv("FIREBASE_CREDENTIALS", "firebase-adminsdk.json")
+ruta_credenciales = settings.FIREBASE_CREDENTIALS
 
 if not firebase_admin._apps:
     try:

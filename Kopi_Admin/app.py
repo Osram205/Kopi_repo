@@ -2,10 +2,37 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import requests
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+def cargar_env_local():
+    env_path = BASE_DIR / ".env"
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+cargar_env_local()
 
 app = Flask(__name__)
-app.secret_key = "super_secreta_clave_flask_admin"
-FASTAPI_URL = "http://127.0.0.1:8000"
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "kopi-admin-dev-secret")
+FASTAPI_URL = os.getenv("FASTAPI_URL", "http://127.0.0.1:8000").rstrip("/")
+FASTAPI_PUBLIC_URL = os.getenv("FASTAPI_PUBLIC_URL", FASTAPI_URL).rstrip("/")
+
+@app.context_processor
+def variables_globales():
+    return {
+        "fastapi_url": FASTAPI_URL,
+        "uploads_url": f"{FASTAPI_PUBLIC_URL}/static/uploads",
+    }
 
 @app.route("/", methods=["GET", "POST"])
 def login():

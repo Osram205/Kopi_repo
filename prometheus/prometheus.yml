@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'kopi_api'
+    static_configs:
+      - targets: ['kopi_api:8000']

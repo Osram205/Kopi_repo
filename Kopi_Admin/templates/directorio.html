@@ -1,107 +1,102 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <title>Kopi Admin - Directorio General</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% include 'partials/theme.html' %}
 </head>
+<body class="bg-kopi-black min-h-screen text-kopi-light pb-12">
+    {% include 'partials/nav.html' %}
 
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
-            <span class="navbar-brand fw-bold text-info">KOPI Centro de Control</span>
-            <div class="navbar-nav me-auto">
-                <a class="nav-link" href="/dashboard">Cuadro de Mando</a>
-                <a class="nav-link" href="/usuarios">Solicitudes Pendientes</a>
-                <a class="nav-link active fw-bold" href="/directorio">Directorio General</a>
-            </div>
-            <a href="/logout" class="btn btn-sm btn-outline-light">Cerrar Sesión</a>
-        </div>
-    </nav>
-
-    <div class="container">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
+            <div class="mb-6 space-y-3">
+            {% for category, message in messages %}
+                <div class="flex items-center p-4 rounded-xl {% if category == 'success' %}bg-green-500/10 text-green-400 border border-green-500/20{% elif category == 'danger' %}bg-red-500/10 text-red-400 border border-red-500/20{% elif category == 'info' %}bg-blue-500/10 text-blue-400 border border-blue-500/20{% elif category == 'warning' %}bg-orange-500/10 text-orange-400 border border-orange-500/20{% else %}bg-kopi-yellow/10 text-kopi-yellow border border-kopi-yellow/20{% endif %}">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+            </div>
         {% endif %}
         {% endwith %}
 
-        <div class="mb-4">
-            <h4 class="fw-bold text-dark">Directorio de Usuarios Activos</h4>
-            <p class="text-muted">Gestiona a los conductores y pasajeros ya evaluados. Aplica suspensiones en caso de
-                reporte.</p>
+        <div class="mb-8">
+            <h4 class="text-2xl font-bold text-white mb-1 tracking-tight">Directorio de usuarios activos</h4>
+            <p class="text-kopi-gray">Gestiona a los conductores y pasajeros ya evaluados. Aplica suspensiones en caso de reporte.</p>
         </div>
-        <div class="card border-0 shadow-sm mb-5">
-            <div class="card-header bg-white border-0 pt-3 pb-0">
-                <ul class="nav nav-tabs card-header-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link {% if not estatus_actual %}active fw-bold text-dark{% endif %}"
-                            href="/directorio">Todos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if estatus_actual == 'aprobado' %}active fw-bold text-success{% endif %}"
-                            href="/directorio?estatus=aprobado">Aprobados</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if estatus_actual == 'rechazado' %}active fw-bold text-danger{% endif %}"
-                            href="/directorio?estatus=rechazado">Rechazados</a>
-                    </li>
-                </ul>
+
+        <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl shadow-xl overflow-hidden mb-8">
+            <div class="border-b border-white/5">
+                <nav class="flex -mb-px px-6" aria-label="Tabs">
+                    <a href="/directorio" class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors {% if not estatus_actual %}border-kopi-yellow text-kopi-yellow{% else %}border-transparent text-kopi-gray hover:text-white hover:border-white/20{% endif %}">
+                        Todos
+                    </a>
+                    <a href="/directorio?estatus=aprobado" class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors {% if estatus_actual == 'aprobado' %}border-green-400 text-green-400{% else %}border-transparent text-kopi-gray hover:text-white hover:border-white/20{% endif %}">
+                        Aprobados
+                    </a>
+                    <a href="/directorio?estatus=rechazado" class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors {% if estatus_actual == 'rechazado' %}border-red-400 text-red-400{% else %}border-transparent text-kopi-gray hover:text-white hover:border-white/20{% endif %}">
+                        Rechazados
+                    </a>
+                </nav>
             </div>
-            <div class="card-body p-0">
-            </div>
-        </div>
-        <div class="card border-0 shadow-sm mb-5">
-            <div class="card-body p-0">
-                <table class="table table-responsive table-hover mb-0">
-                    <thead class="table-light text-muted small text-uppercase">
-                        <tr>
-                            <th class="ps-4">Matrícula</th>
-                            <th>Nombre Completo</th>
-                            <th>Estatus</th>
-                            <th class="text-center">Sanciones</th>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-white/5 bg-kopi-dark/50">
+                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider">Matrícula</th>
+                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider">Nombre Completo</th>
+                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider">Estatus</th>
+                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider text-center">Sanciones</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-white/5">
                         {% if alumnos %}
                         {% for alumno in alumnos %}
-                        <tr>
-                            <td class="align-middle ps-4 fw-bold text-primary">{{ alumno.matricula }}</td>
-                            <td class="align-middle">{{ alumno.nombre }}<br><small class="text-muted">{{
-                                    alumno.correo_institucional }}</small></td>
-                            <td class="align-middle">
+                        <tr class="hover:bg-white/[0.02] transition-colors">
+                            <td class="py-4 px-6 font-bold text-kopi-yellow">{{ alumno.matricula }}</td>
+                            <td class="py-4 px-6">
+                                <div class="text-white font-medium">{{ alumno.nombre }}</div>
+                                <div class="text-kopi-gray text-xs mt-0.5">{{ alumno.correo_institucional }}</div>
+                            </td>
+                            <td class="py-4 px-6">
                                 {% if alumno.estatus_verificacion == 'aprobado' %}
-                                <span class="badge bg-success">Conductor Autorizado</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
+                                    Conductor Autorizado
+                                </span>
                                 {% else %}
-                                <span class="badge bg-secondary">Rechazado</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10 text-kopi-gray border border-white/20">
+                                    Rechazado / Pasajero
+                                </span>
                                 {% endif %}
-                            <td class="text-center align-middle">
-                                {% if alumno.estatus_verificacion == 'aprobado' %}
-                                <form action="/revocar/{{ alumno.id }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('¿Seguro que deseas REVOCAR los permisos de conductor de este alumno? Se cancelarán sus viajes activos programados.');">
-                                    <button type="submit" class="btn btn-warning btn-sm px-3 fw-bold shadow-sm me-1">🛑
-                                        Revocar Permiso</button>
-                                </form>
-                                {% endif %}
-
-                                <form action="/suspender/{{ alumno.id }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('¿Confirmas la EXPULSIÓN DEFINITIVA de este alumno del sistema? No podrá volver a publicar ni reservar viajes.');">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-bold">Suspender
-                                        Cuenta</button>
-                                </form>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="flex justify-center items-center gap-2">
+                                    {% if alumno.estatus_verificacion == 'aprobado' %}
+                                    <form action="/revocar/{{ alumno.id }}" method="POST" class="inline-block" onsubmit="return confirm('¿Seguro que deseas REVOCAR los permisos de conductor de este alumno? Se cancelarán sus viajes activos programados.');">
+                                        <button type="submit" class="px-3 py-1.5 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 rounded-lg text-xs font-bold transition-colors">
+                                            Revocar permiso
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                    <form action="/suspender/{{ alumno.id }}" method="POST" class="inline-block" onsubmit="return confirm('¿Confirmas la EXPULSIÓN DEFINITIVA de este alumno del sistema? No podrá volver a publicar ni reservar viajes.');">
+                                        <button type="submit" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition-colors">
+                                            Suspender cuenta
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="4" class="text-center py-5 text-muted">
-                                No hay usuarios evaluados en el sistema actualmente.
+                            <td colspan="4" class="py-12 text-center text-kopi-gray">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-12 h-12 mb-3 text-kopi-gray/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                    <p>No hay usuarios evaluados en el sistema actualmente.</p>
+                                </div>
                             </td>
                         </tr>
                         {% endif %}
@@ -110,7 +105,5 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

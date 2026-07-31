@@ -19,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (!app()->runningInConsole()) {
+            if (request()->header('X-Forwarded-Proto') === 'https' || env('APP_ENV') === 'production' || str_contains(env('APP_URL'), 'devtunnels.ms')) {
+                \Illuminate\Support\Facades\URL::forceScheme('https');
+                \Illuminate\Support\Facades\URL::forceRootUrl(rtrim(env('APP_URL'), '/'));
+            }
+        }
     }
 }

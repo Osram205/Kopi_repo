@@ -1,0 +1,107 @@
+name: kopi-ecosystem
+
+services:
+  # --- CAPA DE BASE DE DATOS ( AISLADA ) ---
+  kopi_db:
+    image: mysql:8.0.35
+    container_name: kopi_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-Valeos0430!}
+      MYSQL_DATABASE: Kopi
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - kopi_private
+
+  # --- BACKEND FASTAPI (PYTHON) ---
+  kopi_api:
+    build: 
+      context: ./Kopi_API
+      dockerfile: Dockerfile
+    image: kopi-api:1.0.0
+    restart: unless-stopped
+    depends_on:
+      - kopi_db
+    environment:
+      - SQLALCHEMY_DATABASE_URL=mysql+pymysql://root:${DB_ROOT_PASSWORD:-Valeos0430!}@kopi_db:3306/Kopi
+    networks:
+      - kopi_private
+      - kopi_public
+
+  # --- FRONTEND APP WEB (LARAVEL / PHP-FPM) ---
+  kopi_web:
+    build:
+      context: ./Kopi_Web
+      dockerfile: Dockerfile
+    image: kopi-web:1.0.0
+    container_name: kopi_web_app
+    restart: unless-stopped
+    volumes:
+      - web_data:/var/www/html
+    networks:
+      - kopi_public
+
+  # --- FRONTEND APP ADMIN (FLASK / PYTHON) ---
+  kopi_admin:
+    build:
+      context: ./Kopi_Admin
+      dockerfile: Dockerfile
+    image: kopi-admin:1.0.0
+    container_name: kopi_admin_app
+    restart: unless-stopped
+    networks:
+      - kopi_public
+
+  # --- PROXY INVERSO GLOBAL (NGINX) ---
+  kopi_proxy:
+    image: nginx:1.25.3-alpine
+    container_name: kopi_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # Montamos el volumen compartido con la app Web para que Nginx sirva los estáticos compilados
+      - web_data:/var/www/html:ro 
+    depends_on:
+      - kopi_api
+      - kopi_web
+      - kopi_admin
+    networks:
+      - kopi_public
+
+  # --- TELEMETRÍA (PROMETHEUS) ---
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: kopi_prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - kopi_public
+
+  # --- DASHBOARDS (GRAFANA) ---
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: kopi_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    networks:
+      - kopi_public
+    depends_on:
+      - prometheus
+
+networks:
+  kopi_private:
+    internal: true
+  kopi_public:
+    driver: bridge
+
+volumes:
+  db_data:
+  web_data:

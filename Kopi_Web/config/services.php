@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'fastapi' => [
+        'url' => rtrim(env('FASTAPI_URL', 'http://127.0.0.1:8000'), '/'),
+        'public_url' => rtrim(env('FASTAPI_PUBLIC_URL', env('FASTAPI_URL', 'http://127.0.0.1:8000')), '/'),
+    ],
+
 ];

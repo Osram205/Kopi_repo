@@ -19,29 +19,93 @@ class AuthController extends Controller
     {
         $request->validate([
             'correo_institucional' => 'required|email',
-            'contrasena' => 'required'
+            'contrasena' => 'required|string',
         ]);
 
         try {
-            // Hacemos la petición a FastAPI simulando el formulario de Swagger
-            $response = Http::asForm()->post(env('FASTAPI_URL') . '/auth/login', [
+            // Mandamos las credenciales en formato x-www-form-urlencoded como pide OAuth2PasswordRequestForm
+            $response = Http::asForm()->post(config('services.fastapi.url') . '/auth/login', [
                 'username' => $request->correo_institucional,
-                'password' => $request->contrasena
+                'password' => $request->contrasena,
             ]);
 
             if ($response->successful()) {
-                // Si FastAPI nos da luz verde, guardamos el JWT en la sesión de Laravel
                 $token = $response->json()['access_token'];
+                Session::regenerate();
                 Session::put('jwt_token', $token);
+                $perfilResponse = Http::withToken($token)->get(config('services.fastapi.url') . '/usuarios/perfil');
                 
-                return redirect()->route('viajes.index')->with('success', '¡Bienvenido a Kopi!');
+                if ($perfilResponse->successful()) {
+                    $datosPerfil = $perfilResponse->json();
+                    // Almacenamos los estados de conductor
+                    Session::put('es_conductor', $datosPerfil['es_conductor'] ?? false);
+                    Session::put('estatus_verificacion', $datosPerfil['estatus_verificacion'] ?? 'pendiente');
+                }
+
+                return redirect()->route('viajes.index');
             }
 
-            // Si FastAPI devuelve 401
-            return back()->with('error', 'Credenciales inválidas. Revisa tu correo y contraseña.');
+            $errDetail = $response->json()['detail'] ?? 'Credenciales incorrectas.'; $mensajeError = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
+            return back()->with('error', $mensajeError)->withInput();
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error de conexión con el servidor principal.');
+            return back()->with('error', 'Error de conexión con el servidor central: ' . $e->getMessage())->withInput();
+        }
+    }
+
+// Procesa el formulario de registro y lo envía a FastAPI
+    public function procesarRegistro(Request $request)
+    {
+        // 1. Validamos todos los campos del formulario
+        $request->validate([
+            'nombre' => 'required|string|max:100',
+            'apellidos' => 'required|string|max:100',
+            'matricula' => 'required|string|max:20',
+            'carrera' => 'required|string|max:100',
+            'telefono' => 'required|string|max:15',
+            'correo_institucional' => 'required|email|ends_with:@upq.edu.mx',
+            'contrasena' => 'required|string|min:6',
+            'foto_credencial_frente' => 'required|image|max:10240',
+            'foto_credencial_trasera' => 'required|image|max:10240'
+        ], [
+            'correo_institucional.ends_with' => 'Debes usar tu correo institucional (@upq.edu.mx).'
+        ]);
+
+        try {
+            // 2. Enviamos los datos a FastAPI usando attach() para enviar como form-data
+            $foto_frente = $request->file('foto_credencial_frente');
+            $foto_trasera = $request->file('foto_credencial_trasera');
+            
+            // Forzar HTTP/1.1 y deshabilitar "Expect: 100-continue" para evitar el bug de cURL (error 56) en Windows XAMPP
+            $response = Http::timeout(60)
+                ->withOptions([
+                    'version' => 1.1,
+                    'headers' => ['Expect' => '']
+                ])
+                ->attach('foto_credencial_frente', file_get_contents($foto_frente->getRealPath()), $foto_frente->getClientOriginalName())
+                ->attach('foto_credencial_trasera', file_get_contents($foto_trasera->getRealPath()), $foto_trasera->getClientOriginalName())
+                ->post(config('services.fastapi.url') . '/auth/registro', [
+                    'nombre' => $request->nombre,
+                    'apellidos' => $request->apellidos,
+                    'matricula' => $request->matricula,
+                    'carrera' => $request->carrera,
+                    'telefono' => $request->telefono,
+                    'correo_institucional' => $request->correo_institucional,
+                    'contrasena' => $request->contrasena
+                ]);
+
+            // 3. Si FastAPI responde exitosamente
+            if ($response->successful()) {
+                return redirect()->route('login')->with('success', '¡Cuenta creada y validada con éxito! Ya puedes iniciar sesión.');
+            }
+
+            // Si hay error desde FastAPI
+            $errDetail = $response->json()['detail'] ?? 'Error al crear la cuenta. Verifica tus datos.';
+            $mensajeError = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
+            return back()->with('error', $mensajeError)->withInput();
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error de conexión con el servidor central: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -60,7 +124,7 @@ class AuthController extends Controller
         ]);
 
         try {
-            $response = Http::post(env('FASTAPI_URL') . '/auth/restablecer-password', [
+            $response = Http::post(config('services.fastapi.url') . '/auth/restablecer-password', [
                 'correo_institucional' => $request->correo_institucional,
                 'matricula' => $request->matricula,
                 'nueva_contrasena' => $request->nueva_contrasena
@@ -70,11 +134,11 @@ class AuthController extends Controller
                 return redirect()->route('login')->with('success', '¡Tu contraseña ha sido restablecida! Ya puedes iniciar sesión.');
             }
 
-            $mensajeError = $response->json()['detail'] ?? 'Error al restablecer la contraseña. Verifica tus datos.';
+            $errDetail = $response->json()['detail'] ?? 'Error al restablecer la contraseña. Verifica tus datos.'; $mensajeError = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
             return back()->with('error', $mensajeError)->withInput();
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error de conexión con el servidor central.')->withInput();
+            return back()->with('error', 'Error de conexión con el servidor central: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -82,7 +146,8 @@ class AuthController extends Controller
     // Cierra la sesión borrando el Token
     public function logout()
     {
-        Session::forget('jwt_token');
+        Session::flush();
+        Session::regenerateToken();
         return redirect()->route('login');
     }
 

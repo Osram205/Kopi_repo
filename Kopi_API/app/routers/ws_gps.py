@@ -50,53 +50,56 @@ def get_ws_user(token: str, db: Session):
 @router.websocket("/{viaje_id}")
 async def gps_endpoint(websocket: WebSocket, viaje_id: int, token: str = Query(...), db: Session = Depends(database.get_db)):
     usuario = get_ws_user(token, db)
-    
     if not usuario:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    # 1. Validar que el viaje exista
-    viaje = db.query(models.Viaje).filter(models.Viaje.id == viaje_id, models.Viaje.deleted_at.is_(None)).first()
+    # 🔥 FIX: Validar que el viaje exista Y ESTÉ ACTIVO
+    viaje = db.query(models.Viaje).filter(
+        models.Viaje.id == viaje_id, 
+        models.Viaje.deleted_at.is_(None),
+        models.Viaje.estatus.in_([models.EstatusViaje.programado, models.EstatusViaje.en_curso])
+    ).first()
+    
     if not viaje:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    # 2. Identificar el rol del usuario en este viaje específico
     es_conductor = (viaje.conductor_id == usuario.id)
-    
     es_pasajero = db.query(models.Reservacion).filter(
         models.Reservacion.viaje_id == viaje_id,
         models.Reservacion.pasajero_id == usuario.id,
         models.Reservacion.estatus_reserva == models.EstatusReserva.aceptado
     ).first()
 
-    # Si no es ni el conductor ni un pasajero aceptado, lo echamos por privacidad
     if not es_conductor and not es_pasajero:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    # 3. Aceptar la conexión a la sala del viaje
     await manager.connect(websocket, viaje_id)
 
     try:
         while True:
-            # Esperamos recibir las coordenadas (formato JSON)
             data = await websocket.receive_json()
-            
-            # REGLA ESTRICTA: Solo el conductor inyecta coordenadas al mapa
             if es_conductor:
-                paquete_gps = {
-                    "tipo": "actualizacion_gps",
-                    "viaje_id": viaje_id,
-                    "latitud": data.get("latitud"),
-                    "longitud": data.get("longitud"),
-                    "timestamp": data.get("timestamp")
-                }
-                # Se dispara el mensaje a todos los pasajeros conectados en ese viaje
-                await manager.broadcast(viaje_id, paquete_gps)
+                # 🔥 FIX: Validar coordenadas reales
+                lat, lon = data.get("latitud"), data.get("longitud")
+                if lat is not None and lon is not None:
+                    await manager.broadcast(viaje_id, {
+                        "tipo": "actualizacion_gps",
+                        "viaje_id": viaje_id,
+                        "latitud": float(lat),
+                        "longitud": float(lon),
+                        "timestamp": data.get("timestamp")
+                    })
             else:
-                # Si un pasajero intenta alterar el mapa, se rechaza silenciosamente o se le avisa
-                await websocket.send_json({"error": "Solo el conductor autorizado puede emitir coordenadas."})
+                await websocket.send_json({"error": "Solo el conductor puede emitir coordenadas."})
                 
     except WebSocketDisconnect:
         manager.disconnect(websocket, viaje_id)
+        # 🔥 FIX: Alerta de pérdida de señal del chofer
+        if es_conductor:
+            await manager.broadcast(viaje_id, {
+                "tipo": "alerta_conexion",
+                "mensaje": "⚠️ El conductor ha perdido la señal GPS o se ha desconectado."
+            })

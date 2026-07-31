@@ -6,8 +6,9 @@ class AdminService:
     @staticmethod
     def listar_usuarios_pendientes(db: Session):
         """Lista a todos los alumnos que han subido credencial pero no han sido aprobados."""
+        # 🔥 FIX 1: Cambiamos 'solicitado' por 'pendiente' según el Enum
         return db.query(models.Usuario).filter(
-            models.Usuario.estatus_verificacion == 'solicitado',
+            models.Usuario.estatus_verificacion == 'pendiente',
             models.Usuario.deleted_at.is_(None)
         ).all()
     
@@ -19,7 +20,6 @@ class AdminService:
         if estatus in ['aprobado', 'rechazado']:
             query = query.filter(models.Usuario.estatus_verificacion == estatus)
         else:
-            # Si no viene filtro, muestra ambos
             query = query.filter(models.Usuario.estatus_verificacion.in_(['aprobado', 'rechazado']))
             
         return query.all()
@@ -35,6 +35,13 @@ class AdminService:
             raise HTTPException(status_code=404, detail="Usuario no encontrado.")
 
         alumno.estatus_verificacion = accion
+        
+        # 🔥 FIX 2: Si el admin aprueba los documentos, le damos oficialmente el rol de conductor
+        if accion == 'aprobado':
+            alumno.es_conductor = True
+        elif accion == 'rechazado':
+            alumno.es_conductor = False
+
         db.commit()
         db.refresh(alumno)
         

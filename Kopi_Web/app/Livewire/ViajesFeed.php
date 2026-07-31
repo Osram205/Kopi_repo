@@ -20,7 +20,7 @@ class ViajesFeed extends Component
     public function cargarViajes()
     {
         $token = Session::get('jwt_token');
-        $response = Http::withToken($token)->get(env('FASTAPI_URL') . '/viajes');
+        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/viajes');
         
         if ($response->successful()) {
             $this->todosLosViajes = $response->json();
@@ -48,14 +48,14 @@ class ViajesFeed extends Component
         ];
 
         // Disparamos la petición a FastAPI
-        $response = Http::withToken($token)->post(env('FASTAPI_URL') . '/reservaciones', $payload);
+        $response = Http::withToken($token)->post(config('services.fastapi.url') . '/reservaciones', $payload);
 
         if ($response->successful()) {
             session()->flash('success', '¡Asiento solicitado con éxito! Notificación enviada al conductor.');
             $this->cargarViajes(); // Recargamos para actualizar el contador de asientos disponibles
         } else {
             // Si FastAPI lanza un HTTPException, lo atrapamos y mostramos el detalle
-            $error = $response->json()['detail'] ?? 'Hubo un error al procesar tu solicitud.';
+            $errDetail = $response->json()['detail'] ?? 'Hubo un error al procesar tu solicitud.'; $error = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
             session()->flash('error', $error);
         }
     }

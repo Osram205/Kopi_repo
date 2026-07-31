@@ -1,0 +1,49 @@
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='logo/favicon-32x32.png') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='logo/apple-touch-icon.png') }}">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          kopi: {
+            black: '#0a0a0a',
+            dark: '#171717',
+            card: '#1f1f1f',
+            yellow: '#facc15',
+            'yellow-hover': '#eab308',
+            gray: '#52525b',
+            light: '#e4e4e7',
+          }
+        },
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0a0a0a;
+        color: #e4e4e7;
+    }
+    /* Custom Scrollbar for premium feel */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0a0a0a; 
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #3f3f46; 
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #52525b; 
+    }
+</style>

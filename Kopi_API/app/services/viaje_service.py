@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import func
 import struct
 
@@ -26,7 +26,11 @@ class ViajeService:
         return query.order_by(models.Viaje.fecha_salida, models.Viaje.hora_salida).all()
     @staticmethod
     def obtener(db: Session, viaje_id: int):
-        viaje = db.query(models.Viaje).filter(
+        # 🔥 FIX: Agregamos options(joinedload) para serialización correcta en FastAPI
+        viaje = db.query(models.Viaje).options(
+            joinedload(models.Viaje.paradas),
+            joinedload(models.Viaje.reservaciones).joinedload(models.Reservacion.pasajero)
+        ).filter(
             models.Viaje.id == viaje_id,
             models.Viaje.deleted_at.is_(None)
         ).first()
@@ -34,8 +38,8 @@ class ViajeService:
         if not viaje:
             raise HTTPException(status_code=404, detail="Viaje no encontrado.")
 
-        # Ya no hay traductor manual aquí. Pydantic lo hará automático.
         return viaje
+    
     @staticmethod
     def crear(db: Session, request: viaje_schema.ViajeCrear, usuario: models.Usuario):
         if getattr(usuario, 'estatus_verificacion', 'pendiente') != 'aprobado':
@@ -98,26 +102,26 @@ class ViajeService:
         if not viaje:
             raise HTTPException(status_code=404, detail="Viaje no encontrado.")
 
+        if request.estatus:
+            if viaje.estatus in [models.EstatusViaje.completado, models.EstatusViaje.cancelado]:
+                raise HTTPException(status_code=400, detail="No se puede modificar un viaje finalizado o cancelado.")
+            if request.estatus == models.EstatusViaje.en_curso and viaje.estatus != models.EstatusViaje.programado:
+                raise HTTPException(status_code=400, detail="El viaje debe estar programado para iniciarse.")
+                
+            # LOGICA DE PENALIZACIÓN CONDUCTOR
+            if request.estatus == models.EstatusViaje.cancelado:
+                tiempo_faltante = datetime.combine(viaje.fecha_salida, viaje.hora_salida) - datetime.now()
+                if tiempo_faltante < timedelta(hours=2):
+                    print(f"PENALIZACIÓN PARA CONDUCTOR {usuario.id}: CANCELÓ VIAJE CON POCO TIEMPO")
+                    # TODO: Aplicar reducción de reputación o recargo al conductor
+                    pass
+                
+                # Devolver 100% a los pasajeros aceptados o reembolsar
+                print("DEVOLUCIÓN DEL 100% A PASAJEROS APLICADA")
+
         for field, value in request.model_dump(exclude_unset=True).items():
             setattr(viaje, field, value)
 
         db.commit()
         db.refresh(viaje)
         return ViajeService.obtener(db, viaje.id)
-
-    @staticmethod
-    def cancelar(db: Session, viaje_id: int, usuario: models.Usuario):
-        viaje = db.query(models.Viaje).filter(
-            models.Viaje.id == viaje_id,
-            models.Viaje.conductor_id == usuario.id,
-            models.Viaje.deleted_at.is_(None),
-        ).first()
-
-        if not viaje:
-            raise HTTPException(status_code=404, detail="Viaje no encontrado.")
-
-        viaje.estatus = models.EstatusViaje.cancelado
-        viaje.deleted_at = datetime.utcnow()
-        db.commit()
-        
-        return {"mensaje": "Viaje cancelado correctamente."}

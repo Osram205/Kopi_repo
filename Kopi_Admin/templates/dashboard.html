@@ -1,73 +1,77 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <title>Kopi Admin - Analítica</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% include 'partials/theme.html' %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+<body class="bg-kopi-black min-h-screen text-kopi-light">
+    {% include 'partials/nav.html' %}
 
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
-            <span class="navbar-brand fw-bold text-info">KOPI Centro de Control</span>
-            <div class="navbar-nav me-auto">
-                <a class="nav-link active fw-bold" href="/dashboard">Cuadro de Mando</a>
-                <a class="nav-link" href="/usuarios">Solicitudes Pendientes</a>
-                <a class="nav-link" href="/directorio">Directorio General</a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h3 class="text-2xl font-bold text-white mb-1 tracking-tight">Indicadores clave</h3>
+                <p class="text-kopi-gray text-sm">Actividad operativa de la comunidad KOPI.</p>
             </div>
-            <a href="/logout" class="btn btn-sm btn-outline-light">Cerrar Sesión</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>Indicadores Clave de Rendimiento (KPIs)</h3>
-            <span class="badge bg-secondary p-2">Actualizado en Tiempo Real</span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-kopi-yellow/10 text-kopi-yellow border border-kopi-yellow/20 shadow-[0_0_10px_rgba(250,204,21,0.2)]">
+                <span class="w-2 h-2 mr-2 rounded-full bg-kopi-yellow animate-pulse"></span>
+                Actualizado en tiempo real
+            </span>
         </div>
 
-        <div class="row mb-5">
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-white p-3">
-                    <div class="text-muted text-uppercase small fw-bold">Comunidad Total</div>
-                    <h2 class="text-primary fw-bold mb-0">{{ metricas.get('usuarios_totales', 0) }}</h2>
-                    <small class="text-muted">Alumnos con cuenta activa</small>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Stat 1 -->
+            <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Comunidad total</div>
+                <h2 class="text-4xl font-bold text-white mb-1">{{ metricas.get('usuarios_totales', 0) }}</h2>
+                <p class="text-sm text-kopi-gray">Alumnos con cuenta activa</p>
             </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-white p-3">
-                    <div class="text-muted text-uppercase small fw-bold">Rutas Activas Hoy</div>
-                    <h2 class="text-success fw-bold mb-0">{{ metricas.get('viajes_activos', 0) }}</h2>
-                    <small class="text-muted">Conductores en circulación</small>
-                </div>
+            
+            <!-- Stat 2 -->
+            <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-kopi-yellow/10 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Rutas activas hoy</div>
+                <h2 class="text-4xl font-bold text-kopi-yellow mb-1 drop-shadow-[0_0_15px_rgba(250,204,21,0.3)]">{{ metricas.get('viajes_activos', 0) }}</h2>
+                <p class="text-sm text-kopi-gray">Conductores en circulación</p>
             </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-white p-3">
-                    <div class="text-muted text-uppercase small fw-bold">Ocupación Activa</div>
-                    <h2 class="text-info fw-bold mb-0">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
-                    <small class="text-muted">Asientos reservados confirmados</small>
-                </div>
+            
+            <!-- Stat 3 -->
+            <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Ocupación activa</div>
+                <h2 class="text-4xl font-bold text-white mb-1">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
+                <p class="text-sm text-kopi-gray">Asientos reservados confirmados</p>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-7 mb-4">
-                <div class="card border-0 shadow-sm p-4">
-                    <h5 class="card-title fw-bold text-muted mb-4">Demanda de Viajes por Día de la Semana</h5>
-                    <canvas id="graficaViajes" style="max-height: 300px;"></canvas>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8">
+                <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl h-full">
+                    <h5 class="text-sm font-bold text-kopi-gray uppercase tracking-wider mb-6">Demanda de Viajes por Día</h5>
+                    <div class="relative h-[300px] w-full">
+                        <canvas id="graficaViajes"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-5 mb-4">
-                <div class="card border-0 shadow-sm p-4">
-                    <h5 class="card-title fw-bold text-muted mb-4">Distribución del Ecosistema</h5>
-                    <canvas id="graficaDistribucion" style="max-height: 300px;"></canvas>
+            <div class="lg:col-span-4">
+                <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl h-full flex flex-col">
+                    <h5 class="text-sm font-bold text-kopi-gray uppercase tracking-wider mb-6">Distribución del Ecosistema</h5>
+                    <div class="relative flex-1 w-full flex items-center justify-center min-h-[250px]">
+                        <canvas id="graficaDistribucion"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Common Chart.js options for dark theme
+        Chart.defaults.color = '#52525b';
+        Chart.defaults.font.family = 'Inter';
+        
         // 1. Gráfica de Barras
         const ctxViajes = document.getElementById('graficaViajes').getContext('2d');
         const viajesActivos = parseInt("{{ metricas.get('viajes_activos', 0) }}") || 0;
@@ -79,13 +83,40 @@
                 datasets: [{
                     label: 'Viajes Completados',
                     data: [34, 45, viajesActivos + 20, viajesActivos, 12],
-                    backgroundColor: 'rgba(25, 135, 84, 0.75)',
-                    borderColor: 'rgb(25, 135, 84)',
+                    backgroundColor: 'rgba(250, 204, 21, 0.8)', // Kopi Yellow
+                    borderColor: '#facc15',
                     borderWidth: 1,
-                    borderRadius: 5
+                    borderRadius: 6,
+                    hoverBackgroundColor: '#eab308'
                 }]
             },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1f1f1f',
+                        titleColor: '#fff',
+                        bodyColor: '#e4e4e7',
+                        borderColor: '#3f3f46',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                },
+                scales: { 
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                        border: { display: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false }
+                    }
+                } 
+            }
         });
 
         // 2. Gráfica de Dona
@@ -99,13 +130,30 @@
                         parseInt("{{ metricas.get('usuarios_totales', 0) }}") || 0,
                         parseInt("{{ metricas.get('alumnos_transportandose', 0) }}") || 0
                     ],
-                    backgroundColor: ['#0d6efd', '#0dcaf0'],
+                    backgroundColor: ['#facc15', '#171717'], // Yellow and Dark
+                    borderColor: '#262626',
+                    borderWidth: 2,
                     hoverOffset: 4
                 }]
             },
-            options: { responsive: true }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } },
+                    tooltip: {
+                        backgroundColor: '#1f1f1f',
+                        titleColor: '#fff',
+                        bodyColor: '#e4e4e7',
+                        borderColor: '#3f3f46',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8
+                    }
+                }
+            }
         });
     </script>
 </body>
-
 </html>

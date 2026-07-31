@@ -13,6 +13,7 @@ class RestablecerPassword extends Component
 
     // Propiedades del Paso 2
     public $nueva_contrasena;
+    public $codigo_otp;
     public $token_recuperacion;
 
     // Control del Wizard (Paso actual)
@@ -27,7 +28,7 @@ class RestablecerPassword extends Component
         ]);
 
         try {
-            $response = Http::post(env('FASTAPI_URL') . '/auth/verificar-identidad', [
+            $response = Http::post(config('services.fastapi.url') . '/auth/verificar-identidad', [
                 'correo_institucional' => $this->correo_institucional,
                 'matricula' => $this->matricula
             ]);
@@ -39,7 +40,9 @@ class RestablecerPassword extends Component
                 $this->paso = 2;
                 session()->forget('error');
             } else {
-                session()->flash('error', $response->json()['detail'] ?? 'Identidad no encontrada.');
+                $errDetail = $response->json()['detail'] ?? 'Identidad no encontrada.';
+                $error = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
+                session()->flash('error', $error);
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Error de comunicación con el servidor central.');
@@ -49,29 +52,33 @@ class RestablecerPassword extends Component
     // Ejecuta el Paso 2 utilizando el token validado
     public function cambiarContrasena()
     {
+        // Validamos que el código de Laravel obligue a escribir 6 números
         $this->validate([
+            'codigo_otp' => 'required|digits:6',
             'nueva_contrasena' => 'required|string|min:6',
         ]);
 
         try {
-            $response = Http::post(env('FASTAPI_URL') . '/auth/restablecer-con-token', [
+            $response = Http::post(config('services.fastapi.url') . '/auth/restablecer-con-token', [
                 'token' => $this->token_recuperacion,
+                'codigo_otp' => $this->codigo_otp, // <-- Lo mandamos a la API
                 'nueva_contrasena' => $this->nueva_contrasena
             ]);
 
             if ($response->successful()) {
-                // Redirigimos al Login tradicional de Laravel con mensaje de éxito
-                return redirect()->route('login')->with('success', '¡Tu contraseña ha sido actualizada con éxito! Ya puedes ingresar.');
+                return redirect()->route('login')->with('success', 'Tu contraseña ha sido restablecida correctamente.');
             } else {
-                session()->flash('error', $response->json()['detail'] ?? 'El proceso falló.');
+                $errDetail = $response->json()['detail'] ?? 'Ocurrió un problema.';
+                $error = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
+                session()->flash('error', $error);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Error de conexión al procesar el cambio.');
+            session()->flash('error', 'Error al procesar la actualización en el servidor.');
         }
     }
 
     public function render()
     {
-        return view('livewire.restablecer-password')->layout('layouts.app');
+        return view('auth.restablecer-password')->layout('layouts.app');
     }
 }

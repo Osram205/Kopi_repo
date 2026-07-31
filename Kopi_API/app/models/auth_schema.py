@@ -4,6 +4,8 @@ from datetime import datetime
 
 class UsuarioRegistro(BaseModel):
     nombre: str
+    apellidos: str
+    carrera: str
     matricula: str
     correo_institucional: EmailStr
     contrasena: str
@@ -23,10 +25,13 @@ class UsuarioLogin(BaseModel):
 class UsuarioRespuesta(BaseModel):
     id: int
     nombre: str
+    apellidos: Optional[str] = None
+    carrera: Optional[str] = None
     matricula: str
     correo_institucional: str
     telefono: str
-    foto_credencial: Optional[str] = None
+    foto_credencial_frente: Optional[str] = None
+    foto_credencial_trasera: Optional[str] = None
     estatus_verificacion: str
     es_conductor: bool
     created_at: datetime
@@ -44,4 +49,5 @@ class VerificarIdentidad(BaseModel):
 
 class RestablecerConToken(BaseModel):
     token: str
+    codigo_otp: str
     nueva_contrasena: str

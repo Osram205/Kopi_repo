@@ -6,9 +6,14 @@ from pydantic import BaseModel
 
 class PagoCrear(BaseModel):
     reservacion_id: int
+    monto: float
     metodo_pago: str
 
-
+class PagoConfirmar(BaseModel):
+    reservacion_id: int
+    metodo_pago: str
+    session_id: str
+    
 class PagoEstatus(BaseModel):
     estatus_pago: str
 

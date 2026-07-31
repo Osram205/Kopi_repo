@@ -14,7 +14,8 @@ class PanelConductor extends Component
     public $estatusVerificacion = ''; 
     
     // Propiedades del Formulario de Postulación (Documentos)
-    public $foto_credencial;
+    public $foto_credencial_frente;
+    public $foto_credencial_trasera;
     public $foto_licencia;
     public $tarjeta_circulacion;
 
@@ -29,7 +30,7 @@ class PanelConductor extends Component
     public function obtenerEstatusUsuario()
     {
         $token = Session::get('jwt_token');
-        $response = Http::withToken($token)->get(env('FASTAPI_URL') . '/usuarios/perfil');
+        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/usuarios/perfil');
         
         if ($response->successful()) {
             $this->estatusVerificacion = $response->json()['estatus_verificacion'] ?? '';
@@ -42,7 +43,8 @@ class PanelConductor extends Component
         // 1. LA VALIDACIÓN SE HACE AQUÍ, UNA SOLA VEZ AL INICIO.
         // Si una imagen pesa más de 2MB, Laravel detiene todo aquí y muestra el error.
         $this->validate([
-            'foto_credencial' => 'required|image|max:10230',
+            'foto_credencial_frente' => 'required|image|max:10230',
+            'foto_credencial_trasera' => 'required|image|max:10230',
             'foto_licencia' => 'required|image|max:10230',
             'tarjeta_circulacion' => 'required|image|max:10230',
         ]);
@@ -52,9 +54,14 @@ class PanelConductor extends Component
         // Construimos la petición usando el método ->get() de Livewire para extraer los binarios de forma segura
         $response = Http::withToken($token)
             ->attach(
-                'foto_credencial', 
-                $this->foto_credencial->get(), 
-                $this->foto_credencial->getClientOriginalName()
+                'foto_credencial_frente', 
+                $this->foto_credencial_frente->get(), 
+                $this->foto_credencial_frente->getClientOriginalName()
+            )
+            ->attach(
+                'foto_credencial_trasera', 
+                $this->foto_credencial_trasera->get(), 
+                $this->foto_credencial_trasera->getClientOriginalName()
             )
             ->attach(
                 'foto_licencia', 
@@ -66,13 +73,13 @@ class PanelConductor extends Component
                 $this->tarjeta_circulacion->get(), 
                 $this->tarjeta_circulacion->getClientOriginalName()
             )
-            ->put(env('FASTAPI_URL') . '/usuarios/solicitar-conductor'); // Enviamos por PUT a FastAPI
+            ->put(config('services.fastapi.url') . '/usuarios/solicitar-conductor'); // Enviamos por PUT a FastAPI
 
         if ($response->successful()) {
             session()->flash('success', 'Tu postulación y documentos han sido enviados al comité administrador.');
             $this->obtenerEstatusUsuario();
         } else {
-            $error = $response->json()['detail'] ?? 'Error al subir los documentos de verificación.';
+            $errDetail = $response->json()['detail'] ?? 'Error al subir los documentos de verificación.'; $error = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
             session()->flash('error', $error);
         }
     }
@@ -104,14 +111,14 @@ class PanelConductor extends Component
         ];
 
         // Enviamos la petición a FastAPI
-        $response = Http::withToken($token)->post(env('FASTAPI_URL') . '/vehiculos', $payload);
+        $response = Http::withToken($token)->post(config('services.fastapi.url') . '/vehiculos', $payload);
 
         if ($response->successful()) {
             session()->flash('success', '¡Vehículo registrado con éxito! Tu perfil de conductor está activo.');
             return redirect()->route('viajes.index'); 
         } else {
             // Atrapamos el error 403 de FastAPI o cualquier otra falla de validación
-            $error = $response->json()['detail'] ?? 'Error al dar de alta el coche.';
+            $errDetail = $response->json()['detail'] ?? 'Error al dar de alta el coche.'; $error = is_array($errDetail) ? (isset($errDetail[0]['msg']) ? $errDetail[0]['msg'] : json_encode($errDetail)) : $errDetail;
             session()->flash('error', $error);
         }
     }

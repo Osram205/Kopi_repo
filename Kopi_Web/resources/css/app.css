@@ -1,9 +1,70 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/* Fallback definition for Toyota Type. 
+   Assuming the user will provide the actual font files later.
+*/
+@font-face {
+    font-family: 'Toyota Type';
+    src: local('Toyota Type'), local('ToyotaType');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Toyota Type';
+    src: local('Toyota Type Bold'), local('ToyotaType-Bold');
+    font-weight: 700;
+    font-style: normal;
+}
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Toyota Type', 'ToyotaType', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Custom Palette: Yellow, Red, Black */
+    --color-primary-400: #FACC15; 
+    --color-primary-500: #FBBF24; /* Golden Yellow */
+    --color-primary-600: #D97706; 
+    
+    --color-accent-500: #DC2626; /* Crimson Red */
+    
+    --color-brand-900: #09090B; /* Jet Black */
+    --color-brand-800: #18181B; /* Onyx / Surface */
+}
+
+@layer base {
+    body {
+        @apply bg-brand-900 text-gray-100 font-sans antialiased selection:bg-primary-500 selection:text-black;
+    }
+    
+    /* Light Mode Hack: Invert the palette */
+    html.light {
+        --color-primary-400: #F87171;
+        --color-primary-500: #EF4444; /* UPQ Red */
+        --color-primary-600: #DC2626;
+        --color-accent-500: #FBBF24; /* Yellow as accent */
+        
+        --color-brand-900: #F9FAFB;
+        --color-brand-800: #FFFFFF;
+        
+        --color-gray-900: #F3F4F6;
+        --color-gray-800: #E5E7EB;
+        --color-gray-700: #D1D5DB;
+        --color-gray-600: #9CA3AF;
+        --color-gray-500: #6B7280;
+        --color-gray-400: #4B5563;
+        --color-gray-300: #374151;
+        --color-gray-200: #1F2937;
+        --color-gray-100: #111827;
+        
+        --color-white: #000000;
+        --color-black: #FFFFFF;
+    }
+    
+    html.light .leaflet-tile-pane {
+        filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+    }
 }
