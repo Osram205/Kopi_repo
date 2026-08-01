@@ -56,7 +56,7 @@ def actualizar_perfil(
 @router.post("/solicitar-conductor")
 def solicitar_ser_conductor(
     foto_credencial_frente: UploadFile = File(...),
-    foto_credencial_trasera: UploadFile = File(...),
+    poliza_seguro: UploadFile = File(...),
     foto_licencia: UploadFile = File(...),
     tarjeta_circulacion: UploadFile = File(...),
     db: Session = Depends(database.get_db), 
@@ -72,10 +72,9 @@ def solicitar_ser_conductor(
     UPLOAD_DIR = "static/uploads"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     
-    # Mapeamos los archivos entrantes para procesarlos y renombrarlos sistemáticamente
     documentos = [
         (foto_credencial_frente, "foto_credencial_frente"),
-        (foto_credencial_trasera, "foto_credencial_trasera"),
+        (poliza_seguro, "poliza_seguro"),
         (foto_licencia, "foto_licencia"),
         (tarjeta_circulacion, "tarjeta_circulacion")
     ]

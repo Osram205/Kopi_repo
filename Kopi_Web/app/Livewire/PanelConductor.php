@@ -13,9 +13,8 @@ class PanelConductor extends Component
 
     public $estatusVerificacion = ''; 
     
-    // Propiedades del Formulario de Postulación (Documentos)
     public $foto_credencial_frente;
-    public $foto_credencial_trasera;
+    public $poliza_seguro;
     public $foto_licencia;
     public $tarjeta_circulacion;
 
@@ -44,24 +43,25 @@ class PanelConductor extends Component
         // Si una imagen pesa más de 2MB, Laravel detiene todo aquí y muestra el error.
         $this->validate([
             'foto_credencial_frente' => 'required|image|max:10230',
-            'foto_credencial_trasera' => 'required|image|max:10230',
+            'poliza_seguro' => 'required|image|max:10230',
             'foto_licencia' => 'required|image|max:10230',
             'tarjeta_circulacion' => 'required|image|max:10230',
         ]);
 
         $token = Session::get('jwt_token');
 
-        // Construimos la petición usando el método ->get() de Livewire para extraer los binarios de forma segura
+        // Construimos la petición de forma segura, forzando explícitamente multipart/form-data
         $response = Http::withToken($token)
+            ->asMultipart()
             ->attach(
                 'foto_credencial_frente', 
                 $this->foto_credencial_frente->get(), 
                 $this->foto_credencial_frente->getClientOriginalName()
             )
             ->attach(
-                'foto_credencial_trasera', 
-                $this->foto_credencial_trasera->get(), 
-                $this->foto_credencial_trasera->getClientOriginalName()
+                'poliza_seguro', 
+                $this->poliza_seguro->get(), 
+                $this->poliza_seguro->getClientOriginalName()
             )
             ->attach(
                 'foto_licencia', 

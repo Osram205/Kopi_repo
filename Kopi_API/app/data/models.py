@@ -56,7 +56,7 @@ class Usuario(Base):
     telefono = Column(String(15), nullable=False)
     foto_perfil = Column(String(255), nullable=True)
     foto_credencial_frente = Column(String(255), nullable=True)
-    foto_credencial_trasera = Column(String(255), nullable=True)
+    poliza_seguro = Column(String(255), nullable=True)
     estatus_verificacion = Column(String(20), default="pendiente")
     es_conductor = Column(Boolean, default=False)
     fcm_token = Column(String(512), nullable=True)

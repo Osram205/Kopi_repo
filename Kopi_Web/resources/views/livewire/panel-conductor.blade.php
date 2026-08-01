@@ -39,9 +39,9 @@
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">CREDENCIAL ESCOLAR (REVERSO)</label>
-                                <input type="file" wire:model="foto_credencial_trasera" class="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-sm file:font-black file:bg-gray-900 file:text-primary-500 hover:file:bg-black file:uppercase file:cursor-pointer border-2 border-gray-800 focus:border-primary-500 transition-colors">
-                                @error('foto_credencial_trasera') <span class="text-accent-500 text-xs mt-2 block font-bold uppercase">{{ $message }}</span> @enderror
+                                <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">PÓLIZA DE SEGURO</label>
+                                <input type="file" wire:model="poliza_seguro" class="w-full text-sm text-gray-400 file:mr-4 file:py-3 file:px-4 file:border-0 file:text-sm file:font-black file:bg-gray-900 file:text-primary-500 hover:file:bg-black file:uppercase file:cursor-pointer border-2 border-gray-800 focus:border-primary-500 transition-colors">
+                                @error('poliza_seguro') <span class="text-accent-500 text-xs mt-2 block font-bold uppercase">{{ $message }}</span> @enderror
                             </div>
                             
                             <div>
