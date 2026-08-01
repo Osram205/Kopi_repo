@@ -53,7 +53,7 @@ def actualizar_perfil(
     return {"mensaje": "Perfil actualizado correctamente", "foto_perfil": usuario_actual.foto_perfil}
 
 # 2. ENDPOINT PARA LEVANTAR LA MANO COMO CONDUCTOR
-@router.put("/solicitar-conductor")
+@router.post("/solicitar-conductor")
 def solicitar_ser_conductor(
     foto_credencial_frente: UploadFile = File(...),
     foto_credencial_trasera: UploadFile = File(...),

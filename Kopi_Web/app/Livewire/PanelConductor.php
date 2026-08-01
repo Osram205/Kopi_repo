@@ -73,7 +73,7 @@ class PanelConductor extends Component
                 $this->tarjeta_circulacion->get(), 
                 $this->tarjeta_circulacion->getClientOriginalName()
             )
-            ->put(config('services.fastapi.url') . '/usuarios/solicitar-conductor'); // Enviamos por PUT a FastAPI
+            ->post(config('services.fastapi.url') . '/usuarios/solicitar-conductor'); // Enviamos por POST a FastAPI
 
         if ($response->successful()) {
             session()->flash('success', 'Tu postulación y documentos han sido enviados al comité administrador.');
