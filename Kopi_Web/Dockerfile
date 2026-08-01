@@ -8,6 +8,11 @@ RUN apt-get update && apt-get install -y libzip-dev zip unzip \
 # Habilitar el módulo mod_rewrite de Apache para Laravel
 RUN a2enmod rewrite
 
+# CONFIGURACIÓN DE PHP: Aumentar el límite de subida de archivos pesados
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 20M/g' "$PHP_INI_DIR/php.ini" \
+    && sed -i 's/post_max_size = 8M/post_max_size = 25M/g' "$PHP_INI_DIR/php.ini"
+
 # CONFIGURACIÓN DE APACHE (Puerto 8080 y DocumentRoot a /public)
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
