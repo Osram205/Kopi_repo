@@ -49,6 +49,9 @@ class AdminService:
     @staticmethod
     def obtener_metricas(db: Session):
         """Calcula los KPIs en tiempo real del sistema."""
+        from sqlalchemy import func
+        from datetime import datetime, timedelta
+
         usuarios_totales = db.query(models.Usuario).count()
         viajes_activos = db.query(models.Viaje).filter(models.Viaje.estatus == models.EstatusViaje.programado).count()
         # Contar cuántos asientos están ocupados en viajes programados
@@ -56,10 +59,35 @@ class AdminService:
             models.Reservacion.estatus_reserva == models.EstatusReserva.aceptado
         ).count()
         
+        # 1. Ahorro CO2 (Aprox. 2.5 kg por reserva compartida completada)
+        reservas_completadas = db.query(models.Reservacion).join(models.Viaje).filter(
+            models.Viaje.estatus == models.EstatusViaje.completado,
+            models.Reservacion.estatus_reserva == models.EstatusReserva.aceptado
+        ).count()
+        ahorro_co2 = reservas_completadas * 2.5  # kg de CO2
+        
+        # 2. Demanda por día de la semana (Lunes a Viernes)
+        # Asumiendo MySQL/SQLite DATE() extract, pero lo hacemos en memoria por compatibilidad rápida
+        # Obtener todos los viajes completados de los últimos 7 días
+        hace_7_dias = datetime.utcnow() - timedelta(days=7)
+        viajes_recientes = db.query(models.Viaje).filter(
+            models.Viaje.created_at >= hace_7_dias
+        ).all()
+        
+        viajes_por_dia = [0, 0, 0, 0, 0, 0, 0] # Lunes=0, Domingo=6
+        for v in viajes_recientes:
+            dia = v.created_at.weekday()
+            viajes_por_dia[dia] += 1
+        
+        # Filtrar solo de Lunes a Viernes
+        demanda_semanal = viajes_por_dia[0:5]
+        
         return {
             "usuarios_totales": usuarios_totales,
             "viajes_activos": viajes_activos,
-            "alumnos_transportandose": reservas_aceptadas
+            "alumnos_transportandose": reservas_aceptadas,
+            "ahorro_co2": ahorro_co2,
+            "demanda_semanal": demanda_semanal
         }
 
     @staticmethod

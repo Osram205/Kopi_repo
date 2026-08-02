@@ -21,44 +21,52 @@
             </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <!-- Stat 1 -->
-            <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+            <div class="bg-kopi-black border-4 border-kopi-gray p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#52525b] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#52525b] transition-all">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
                 <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Comunidad total</div>
                 <h2 class="text-4xl font-bold text-white mb-1">{{ metricas.get('usuarios_totales', 0) }}</h2>
                 <p class="text-sm text-kopi-gray">Alumnos con cuenta activa</p>
             </div>
             
             <!-- Stat 2 -->
-            <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-kopi-yellow/10 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Rutas activas hoy</div>
+            <div class="bg-kopi-black border-4 border-kopi-yellow p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#facc15] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#facc15] transition-all">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-kopi-yellow/20 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold font-mono text-kopi-yellow uppercase tracking-wider mb-2">Rutas activas hoy</div>
                 <h2 class="text-4xl font-bold text-kopi-yellow mb-1 drop-shadow-[0_0_15px_rgba(250,204,21,0.3)]">{{ metricas.get('viajes_activos', 0) }}</h2>
                 <p class="text-sm text-kopi-gray">Conductores en circulación</p>
             </div>
             
             <!-- Stat 3 -->
-            <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Ocupación activa</div>
-                <h2 class="text-4xl font-bold text-white mb-1">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
-                <p class="text-sm text-kopi-gray">Asientos reservados confirmados</p>
+            <div class="bg-kopi-black border-4 border-white p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#ffffff] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#ffffff] transition-all">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold font-mono text-white uppercase tracking-wider mb-2">Ocupación activa</div>
+                <h2 class="text-4xl font-black text-white mb-1">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
+                <p class="text-sm font-mono text-kopi-gray">Asientos reservados confirmados</p>
+            </div>
+            
+            <!-- Stat 4 -->
+            <div class="bg-kopi-black border-4 border-green-500 p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#22c55e] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#22c55e] transition-all">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-green-500/20 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold font-mono text-green-500 uppercase tracking-wider mb-2">Ahorro CO₂</div>
+                <h2 class="text-4xl font-black text-white mb-1">{{ metricas.get('ahorro_co2', 0) }} <span class="text-xl">kg</span></h2>
+                <p class="text-sm font-mono text-kopi-gray">Emisiones evitadas al compartir</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8">
-                <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl h-full">
-                    <h5 class="text-sm font-bold text-kopi-gray uppercase tracking-wider mb-6">Demanda de Viajes por Día</h5>
+                <div class="bg-kopi-black border-4 border-kopi-gray p-6 shadow-[8px_8px_0_0_#52525b] h-full">
+                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-kopi-gray pb-2">Demanda de Viajes por Día</h5>
                     <div class="relative h-[300px] w-full">
                         <canvas id="graficaViajes"></canvas>
                     </div>
                 </div>
             </div>
             <div class="lg:col-span-4">
-                <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl h-full flex flex-col">
-                    <h5 class="text-sm font-bold text-kopi-gray uppercase tracking-wider mb-6">Distribución del Ecosistema</h5>
+                <div class="bg-kopi-black border-4 border-kopi-gray p-6 shadow-[8px_8px_0_0_#52525b] h-full flex flex-col">
+                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-kopi-gray pb-2">Distribución del Ecosistema</h5>
                     <div class="relative flex-1 w-full flex items-center justify-center min-h-[250px]">
                         <canvas id="graficaDistribucion"></canvas>
                     </div>
@@ -74,7 +82,7 @@
         
         // 1. Gráfica de Barras
         const ctxViajes = document.getElementById('graficaViajes').getContext('2d');
-        const viajesActivos = parseInt("{{ metricas.get('viajes_activos', 0) }}") || 0;
+        const demandaSemanal = {{ metricas.get('demanda_semanal', [0, 0, 0, 0, 0]) | tojson | safe }};
 
         new Chart(ctxViajes, {
             type: 'bar',
@@ -82,10 +90,10 @@
                 labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
                 datasets: [{
                     label: 'Viajes Completados',
-                    data: [34, 45, viajesActivos + 20, viajesActivos, 12],
-                    backgroundColor: 'rgba(250, 204, 21, 0.8)', // Kopi Yellow
-                    borderColor: '#facc15',
-                    borderWidth: 1,
+                    data: demandaSemanal,
+                    backgroundColor: '#facc15', // Kopi Yellow Solid
+                    borderColor: '#000000',
+                    borderWidth: 3,
                     borderRadius: 6,
                     hoverBackgroundColor: '#eab308'
                 }]
@@ -108,12 +116,14 @@
                 scales: { 
                     y: { 
                         beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-                        border: { display: false }
+                        grid: { color: '#3f3f46', drawBorder: true },
+                        border: { display: true, color: '#facc15', width: 2 },
+                        ticks: { font: { family: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' } }
                     },
                     x: {
                         grid: { display: false },
-                        border: { display: false }
+                        border: { display: true, color: '#facc15', width: 2 },
+                        ticks: { font: { family: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace', weight: 'bold' } }
                     }
                 } 
             }
@@ -130,9 +140,9 @@
                         parseInt("{{ metricas.get('usuarios_totales', 0) }}") || 0,
                         parseInt("{{ metricas.get('alumnos_transportandose', 0) }}") || 0
                     ],
-                    backgroundColor: ['#facc15', '#171717'], // Yellow and Dark
-                    borderColor: '#262626',
-                    borderWidth: 2,
+                    backgroundColor: ['#facc15', '#ffffff'], // Yellow and White
+                    borderColor: '#000000',
+                    borderWidth: 3,
                     hoverOffset: 4
                 }]
             },
