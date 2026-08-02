@@ -1,73 +1,119 @@
 <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='logo/favicon-32x32.png') }}">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo/apple-touch-icon.png') }}">
+<!-- Alpine.js (Required for exactly matching the Web's x-data theme toggle) -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<!-- Tailwind CDN (v3) configured to match Web App's v4 setup -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-  // Dynamic theme support
-  function toggleTheme() {
-    const html = document.documentElement;
-    if (html.classList.contains('dark')) {
-      html.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    } else {
-      html.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    }
-  }
-
-  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-
   tailwind.config = {
     darkMode: 'class',
     theme: {
       extend: {
         colors: {
-          kopi: {
-            black: '#0a0a0a',
-            dark: '#171717',
-            card: '#1f1f1f',
-            yellow: '#facc15',
-            'yellow-hover': '#eab308',
-            gray: '#52525b',
-            light: '#e4e4e7',
+          brand: {
+            900: '#09090B',
+            800: '#18181B',
+          },
+          primary: {
+            400: '#FACC15',
+            500: '#FBBF24',
+            600: '#D97706',
+          },
+          accent: {
+            500: '#DC2626',
+          },
+          gray: {
+            100: '#f3f4f6',
+            300: '#d1d5db',
+            400: '#9ca3af',
+            800: '#1f2937',
+            900: '#111827',
           }
         },
         fontFamily: {
-          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          sans: ['Toyota Type', 'ToyotaType', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         }
       }
     }
   }
 </script>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @font-face {
+        font-family: 'Toyota Type';
+        src: local('Toyota Type'), local('ToyotaType');
+        font-weight: 400;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'Toyota Type';
+        src: local('Toyota Type Bold'), local('ToyotaType-Bold');
+        font-weight: 700;
+        font-style: normal;
+    }
+
     body {
-        font-family: 'Inter', sans-serif;
+        font-family: "Toyota Type", "ToyotaType", ui-sans-serif, system-ui, sans-serif !important;
     }
-    .dark body {
-        background-color: #0a0a0a;
-        color: #e4e4e7;
+
+    /* Light Mode Hack: Exactly inverting the palette like the Web App */
+    html.light {
+        --color-primary-400: #F87171;
+        --color-primary-500: #EF4444; /* UPQ Red */
+        --color-primary-600: #DC2626;
+        --color-accent-500: #FBBF24; /* Yellow as accent */
+        
+        --color-brand-900: #F9FAFB;
+        --color-brand-800: #FFFFFF;
+        
+        --color-gray-900: #F3F4F6;
+        --color-gray-800: #E5E7EB;
+        --color-gray-700: #D1D5DB;
+        --color-gray-600: #9CA3AF;
+        --color-gray-500: #6B7280;
+        --color-gray-400: #4B5563;
+        --color-gray-300: #374151;
+        --color-gray-200: #1F2937;
+        --color-gray-100: #111827;
+        
+        --color-white: #000000;
+        --color-black: #FFFFFF;
     }
-    body {
-        background-color: #f4f4f5; /* Light mode */
-        color: #18181b;
-    }
-    /* Custom Scrollbar for premium feel */
+    
+    /* Apply variables directly since we use CDN */
+    html.light body, html.light .bg-brand-900 { background-color: var(--color-brand-900) !important; color: var(--color-gray-100) !important; }
+    html.light .bg-brand-800 { background-color: var(--color-brand-800) !important; }
+    html.light .bg-black { background-color: var(--color-black) !important; }
+    html.light .text-white { color: var(--color-white) !important; }
+    html.light .text-gray-100 { color: var(--color-gray-100) !important; }
+    html.light .text-gray-300 { color: var(--color-gray-300) !important; }
+    html.light .text-gray-400 { color: var(--color-gray-400) !important; }
+    html.light .bg-gray-900 { background-color: var(--color-gray-900) !important; }
+    html.light .border-gray-800 { border-color: var(--color-gray-800) !important; }
+    
+    html.light .bg-primary-500 { background-color: var(--color-primary-500) !important; }
+    html.light .text-primary-500 { color: var(--color-primary-500) !important; }
+    html.light .border-primary-500 { border-color: var(--color-primary-500) !important; }
+    html.light .from-primary-500 { --tw-gradient-from: var(--color-primary-500) !important; }
+    html.light .to-primary-500 { --tw-gradient-to: var(--color-primary-500) !important; }
+    
+    html.light .bg-accent-500 { background-color: var(--color-accent-500) !important; }
+    html.light .text-accent-500 { color: var(--color-accent-500) !important; }
+    html.light .border-accent-500 { border-color: var(--color-accent-500) !important; }
+    html.light .from-accent-500 { --tw-gradient-from: var(--color-accent-500) !important; }
+    html.light .to-accent-500 { --tw-gradient-to: var(--color-accent-500) !important; }
+
+    /* Custom Scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: #0a0a0a; 
+        background: var(--color-brand-900, #09090b); 
     }
     ::-webkit-scrollbar-thumb {
-        background: #3f3f46; 
-        border-radius: 4px;
+        background: var(--color-gray-800, #1f2937); 
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #52525b; 
+        background: var(--color-gray-700, #374151); 
     }
 </style>

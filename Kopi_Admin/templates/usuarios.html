@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es" x-data="{ theme: localStorage.getItem('theme') || 'dark' }" x-init="$watch('theme', val => localStorage.setItem('theme', val))" :class="theme">
 <head>
     <meta charset="UTF-8">
     <title>Kopi Admin - Gestión Operativa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     {% include 'partials/theme.html' %}
 </head>
-<body class="bg-kopi-black min-h-screen text-kopi-light pb-12">
+<body class="bg-brand-900 text-gray-100 font-sans antialiased min-h-screen relative overflow-x-hidden selection:bg-primary-500 selection:text-black transition-colors">
     {% include 'partials/nav.html' %}
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -23,50 +23,50 @@
         {% endwith %}
 
         <div class="mb-8 border-b-4 border-kopi-yellow pb-4">
-            <h4 class="text-4xl font-black font-mono text-white uppercase tracking-tighter mb-1">Módulo operativo de seguridad</h4>
-            <p class="text-sm font-mono text-kopi-yellow uppercase">Filtro institucional para el estatus de conductores y aplicación de sanciones.</p>
+            <h4 class="text-4xl font-black text-white uppercase tracking-tighter mb-1">Gestión de Usuarios</h4>
+            <p class="text-sm font-bold text-primary-500 uppercase tracking-widest">Filtro institucional para el estatus de conductores.</p>
         </div>
 
-        <div class="bg-kopi-black border-4 border-orange-500 shadow-[8px_8px_0_0_#f97316] overflow-hidden">
-            <div class="px-6 py-5 border-b-4 border-orange-500 bg-orange-500/10">
-                <h5 class="text-xl font-black font-mono text-orange-500 uppercase m-0">Solicitudes de alta de conductor</h5>
+        <div class="bg-brand-800 border-4 border-gray-800 shadow-[8px_8px_0px_rgba(251,191,36,1)] overflow-hidden">
+            <div class="px-6 py-5 border-b-4 border-gray-800 bg-gray-900">
+                <h5 class="text-xl font-black text-primary-500 uppercase tracking-widest m-0">Solicitudes de alta de conductor</h5>
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse font-mono">
+                <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b-4 border-orange-500 bg-kopi-dark">
-                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-orange-500/20">Matrícula</th>
-                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-orange-500/20">Nombre Completo</th>
-                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-orange-500/20">Correo Institucional</th>
-                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-orange-500/20">Documentos Adjuntos</th>
-                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider text-center">Acciones Ejecutivas</th>
+                        <tr class="border-b-4 border-gray-800 bg-black">
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-widest border-r-2 border-gray-800">Matrícula</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-widest border-r-2 border-gray-800">Nombre Completo</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-widest border-r-2 border-gray-800">Correo Institucional</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-widest border-r-2 border-gray-800">Documentos Adjuntos</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-widest text-center">Acciones Ejecutivas</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y-2 divide-orange-500/20">
+                    <tbody class="divide-y-2 divide-gray-800">
                         {% if alumnos %}
                         {% for alumno in alumnos %}
-                        <tr class="hover:bg-orange-500/10 transition-colors">
-                            <td class="py-4 px-6 font-bold text-kopi-yellow text-lg border-r-2 border-orange-500/20">{{ alumno.matricula }}</td>
-                            <td class="py-4 px-6 text-white font-bold uppercase border-r-2 border-orange-500/20">{{ alumno.nombre }}</td>
-                            <td class="py-4 px-6 text-kopi-gray text-sm border-r-2 border-orange-500/20">{{ alumno.correo_institucional }}</td>
-                            <td class="py-4 px-6 border-r-2 border-orange-500/20">
+                        <tr class="hover:bg-gray-900 transition-colors">
+                            <td class="py-4 px-6 font-bold text-primary-500 text-lg border-r-2 border-gray-800">{{ alumno.matricula }}</td>
+                            <td class="py-4 px-6 text-white font-bold uppercase border-r-2 border-gray-800">{{ alumno.nombre }}</td>
+                            <td class="py-4 px-6 text-gray-400 text-sm border-r-2 border-gray-800">{{ alumno.correo_institucional }}</td>
+                            <td class="py-4 px-6 border-r-2 border-gray-800">
                                 <div class="inline-flex flex-wrap gap-2">
-                                    <a href="{{ uploads_url }}/{{ alumno.foto_credencial_frente }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-orange-500 bg-kopi-black border-2 border-orange-500 hover:bg-orange-500 hover:text-kopi-black transition-colors shadow-[2px_2px_0_0_#f97316]">Credencial Frente</a>
-                                    <a href="{{ uploads_url }}/{{ alumno.poliza_seguro }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-orange-500 bg-kopi-black border-2 border-orange-500 hover:bg-orange-500 hover:text-kopi-black transition-colors shadow-[2px_2px_0_0_#f97316]">Póliza Seguro</a>
-                                    <a href="{{ uploads_url }}/{{ alumno.foto_licencia }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-orange-500 bg-kopi-black border-2 border-orange-500 hover:bg-orange-500 hover:text-kopi-black transition-colors shadow-[2px_2px_0_0_#f97316]">Licencia</a>
-                                    <a href="{{ uploads_url }}/{{ alumno.tarjeta_circulacion }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-orange-500 bg-kopi-black border-2 border-orange-500 hover:bg-orange-500 hover:text-kopi-black transition-colors shadow-[2px_2px_0_0_#f97316]">Tarjeta</a>
+                                    <a href="{{ uploads_url }}/{{ alumno.foto_credencial_frente }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-primary-500 bg-black border-2 border-primary-500 hover:bg-primary-500 hover:text-black transition-colors shadow-[4px_4px_0px_rgba(251,191,36,0.5)]">Credencial Frente</a>
+                                    <a href="{{ uploads_url }}/{{ alumno.poliza_seguro }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-primary-500 bg-black border-2 border-primary-500 hover:bg-primary-500 hover:text-black transition-colors shadow-[4px_4px_0px_rgba(251,191,36,0.5)]">Póliza Seguro</a>
+                                    <a href="{{ uploads_url }}/{{ alumno.foto_licencia }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-primary-500 bg-black border-2 border-primary-500 hover:bg-primary-500 hover:text-black transition-colors shadow-[4px_4px_0px_rgba(251,191,36,0.5)]">Licencia</a>
+                                    <a href="{{ uploads_url }}/{{ alumno.tarjeta_circulacion }}" target="_blank" class="px-3 py-1.5 text-xs font-bold uppercase text-primary-500 bg-black border-2 border-primary-500 hover:bg-primary-500 hover:text-black transition-colors shadow-[4px_4px_0px_rgba(251,191,36,0.5)]">Tarjeta</a>
                                 </div>
                             </td>
                             <td class="py-4 px-6 text-center">
-                                <div class="flex justify-center items-center gap-3">
-                                    <form action="/evaluar/{{ alumno.id }}" method="POST" class="inline-block">
+                                <div class="flex flex-col gap-2">
+                                    <form action="/evaluar/{{ alumno.id }}" method="POST" class="inline">
                                         <input type="hidden" name="accion" value="aprobado">
-                                        <button type="submit" class="px-4 py-2 bg-green-500 text-kopi-black border-2 border-green-500 hover:bg-kopi-black hover:text-green-500 shadow-[4px_4px_0_0_#22c55e] text-xs font-black uppercase transition-all">Aprobar</button>
+                                        <button type="submit" class="px-4 py-2 text-sm font-black uppercase text-black bg-primary-500 border-2 border-primary-500 hover:bg-primary-600 transition-colors shadow-[4px_4px_0px_rgba(251,191,36,1)] w-full">Aprobar</button>
                                     </form>
-                                    <form action="/evaluar/{{ alumno.id }}" method="POST" class="inline-block">
+                                    <form action="/evaluar/{{ alumno.id }}" method="POST" class="inline">
                                         <input type="hidden" name="accion" value="rechazado">
-                                        <button type="submit" class="px-4 py-2 bg-orange-500 text-kopi-black border-2 border-orange-500 hover:bg-kopi-black hover:text-orange-500 shadow-[4px_4px_0_0_#f97316] text-xs font-black uppercase transition-all">Rechazar</button>
+                                        <button type="submit" class="px-4 py-2 text-sm font-black uppercase text-white bg-red-600 border-2 border-red-600 hover:bg-red-700 transition-colors shadow-[4px_4px_0px_rgba(220,38,38,1)] w-full">Rechazar</button>
                                     </form>
                                     <form action="/suspender/{{ alumno.id }}" method="POST" class="inline-block" onsubmit="return confirm('¿Confirmas la expulsión definitiva del alumno del sistema?');">
                                         <button type="submit" class="px-4 py-2 bg-red-500 text-kopi-black border-2 border-red-500 hover:bg-kopi-black hover:text-red-500 shadow-[4px_4px_0_0_#ef4444] text-xs font-black uppercase transition-all">Suspender</button>

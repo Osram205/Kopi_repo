@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es" x-data="{ theme: localStorage.getItem('theme') || 'dark' }" x-init="$watch('theme', val => localStorage.setItem('theme', val))" :class="theme">
 <head>
     <meta charset="UTF-8">
     <title>Kopi Admin - Analítica</title>
     {% include 'partials/theme.html' %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-kopi-black min-h-screen text-kopi-light">
+<body class="bg-brand-900 text-gray-100 font-sans antialiased min-h-screen relative overflow-x-hidden selection:bg-primary-500 selection:text-black transition-colors">
     {% include 'partials/nav.html' %}
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -15,58 +15,58 @@
                 <h3 class="text-2xl font-bold text-white mb-1 tracking-tight">Indicadores clave</h3>
                 <p class="text-kopi-gray text-sm">Actividad operativa de la comunidad KOPI.</p>
             </div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-kopi-yellow/10 text-kopi-yellow border border-kopi-yellow/20 shadow-[0_0_10px_rgba(250,204,21,0.2)]">
-                <span class="w-2 h-2 mr-2 rounded-full bg-kopi-yellow animate-pulse"></span>
+            <span class="inline-flex items-center px-3 py-1 rounded-none text-xs font-black uppercase bg-gray-900 text-primary-500 border-2 border-gray-800 shadow-[4px_4px_0px_rgba(251,191,36,0.3)]">
+                <span class="w-2 h-2 mr-2 rounded-full bg-primary-500 animate-pulse"></span>
                 Actualizado en tiempo real
             </span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <!-- Stat 1 -->
-            <div class="bg-kopi-black border-4 border-orange-500 p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#f97316] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#f97316] transition-all">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold text-orange-500 uppercase tracking-wider mb-2">Comunidad total</div>
-                <h2 class="text-4xl font-bold text-white mb-1">{{ metricas.get('usuarios_totales', 0) }}</h2>
-                <p class="text-sm text-kopi-gray">Alumnos con cuenta activa</p>
+            <div class="bg-brand-800 border-4 border-gray-800 p-6 relative overflow-hidden shadow-[8px_8px_0px_rgba(251,191,36,1)] hover:-translate-y-1 transition-transform">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gray-900 -mr-10 -mt-10"></div>
+                <div class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 relative z-10">Comunidad total</div>
+                <h2 class="text-4xl font-black text-white mb-1 relative z-10">{{ metricas.get('usuarios_totales', 0) }}</h2>
+                <p class="text-sm text-gray-500 relative z-10">Alumnos con cuenta activa</p>
             </div>
             
             <!-- Stat 2 -->
-            <div class="bg-kopi-black border-4 border-kopi-yellow p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#facc15] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#facc15] transition-all">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-kopi-yellow/20 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold font-mono text-kopi-yellow uppercase tracking-wider mb-2">Rutas activas hoy</div>
-                <h2 class="text-4xl font-bold text-kopi-yellow mb-1 drop-shadow-[0_0_15px_rgba(250,204,21,0.3)]">{{ metricas.get('viajes_activos', 0) }}</h2>
-                <p class="text-sm text-kopi-gray">Conductores en circulación</p>
+            <div class="bg-brand-800 border-4 border-gray-800 p-6 relative overflow-hidden shadow-[8px_8px_0px_rgba(251,191,36,1)] hover:-translate-y-1 transition-transform">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 -mr-10 -mt-10"></div>
+                <div class="text-xs font-black text-primary-500 uppercase tracking-widest mb-2 relative z-10">Rutas activas hoy</div>
+                <h2 class="text-4xl font-black text-primary-500 mb-1 relative z-10">{{ metricas.get('viajes_activos', 0) }}</h2>
+                <p class="text-sm text-gray-500 relative z-10">Conductores en circulación</p>
             </div>
             
             <!-- Stat 3 -->
-            <div class="bg-kopi-black border-4 border-red-600 p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#dc2626] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#dc2626] transition-all">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-red-600/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold font-mono text-red-500 uppercase tracking-wider mb-2">Ocupación activa</div>
-                <h2 class="text-4xl font-black text-white mb-1">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
-                <p class="text-sm font-mono text-kopi-gray">Asientos reservados confirmados</p>
+            <div class="bg-brand-800 border-4 border-gray-800 p-6 relative overflow-hidden shadow-[8px_8px_0px_rgba(220,38,38,1)] hover:-translate-y-1 transition-transform">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-accent-500/10 -mr-10 -mt-10"></div>
+                <div class="text-xs font-black text-accent-500 uppercase tracking-widest mb-2 relative z-10">Ocupación activa</div>
+                <h2 class="text-4xl font-black text-white mb-1 relative z-10">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
+                <p class="text-sm text-gray-500 relative z-10">Asientos reservados</p>
             </div>
             
             <!-- Stat 4 -->
-            <div class="bg-kopi-black border-4 border-green-500 p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#22c55e] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#22c55e] transition-all">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-green-500/20 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold font-mono text-green-500 uppercase tracking-wider mb-2">Ahorro CO₂</div>
-                <h2 class="text-4xl font-black text-white mb-1">{{ metricas.get('ahorro_co2', 0) }} <span class="text-xl">kg</span></h2>
-                <p class="text-sm font-mono text-kopi-gray">Emisiones evitadas al compartir</p>
+            <div class="bg-brand-800 border-4 border-gray-800 p-6 relative overflow-hidden shadow-[8px_8px_0px_rgba(251,191,36,1)] hover:-translate-y-1 transition-transform">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gray-900 -mr-10 -mt-10"></div>
+                <div class="text-xs font-black text-primary-500 uppercase tracking-widest mb-2 relative z-10">Ahorro CO₂</div>
+                <h2 class="text-4xl font-black text-white mb-1 relative z-10">{{ metricas.get('ahorro_co2', 0) }} <span class="text-xl text-gray-400">kg</span></h2>
+                <p class="text-sm text-gray-500 relative z-10">Emisiones evitadas</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8">
-                <div class="bg-kopi-black border-4 border-orange-500 p-6 shadow-[8px_8px_0_0_#f97316] h-full">
-                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-orange-500 pb-2">Demanda de Viajes por Día</h5>
+                <div class="bg-brand-800 border-4 border-gray-800 p-6 shadow-[8px_8px_0px_rgba(251,191,36,1)] h-full">
+                    <h5 class="text-xl font-black text-white uppercase tracking-widest mb-6 border-b-2 border-gray-800 pb-2">Demanda de Viajes por Día</h5>
                     <div class="relative h-[300px] w-full">
                         <canvas id="graficaViajes"></canvas>
                     </div>
                 </div>
             </div>
             <div class="lg:col-span-4">
-                <div class="bg-kopi-black border-4 border-orange-500 p-6 shadow-[8px_8px_0_0_#f97316] h-full flex flex-col">
-                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-orange-500 pb-2">Distribución del Ecosistema</h5>
+                <div class="bg-brand-800 border-4 border-gray-800 p-6 shadow-[8px_8px_0px_rgba(251,191,36,1)] h-full flex flex-col">
+                    <h5 class="text-xl font-black text-white uppercase tracking-widest mb-6 border-b-2 border-gray-800 pb-2">Distribución del Ecosistema</h5>
                     <div class="relative flex-1 w-full flex items-center justify-center min-h-[250px]">
                         <canvas id="graficaDistribucion"></canvas>
                     </div>
