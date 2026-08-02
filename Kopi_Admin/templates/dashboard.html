@@ -23,9 +23,9 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <!-- Stat 1 -->
-            <div class="bg-kopi-black border-4 border-kopi-gray p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#52525b] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#52525b] transition-all">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold text-kopi-gray uppercase tracking-wider mb-2">Comunidad total</div>
+            <div class="bg-kopi-black border-4 border-orange-500 p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#f97316] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#f97316] transition-all">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold text-orange-500 uppercase tracking-wider mb-2">Comunidad total</div>
                 <h2 class="text-4xl font-bold text-white mb-1">{{ metricas.get('usuarios_totales', 0) }}</h2>
                 <p class="text-sm text-kopi-gray">Alumnos con cuenta activa</p>
             </div>
@@ -39,9 +39,9 @@
             </div>
             
             <!-- Stat 3 -->
-            <div class="bg-kopi-black border-4 border-white p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#ffffff] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#ffffff] transition-all">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
-                <div class="text-xs font-bold font-mono text-white uppercase tracking-wider mb-2">Ocupación activa</div>
+            <div class="bg-kopi-black border-4 border-red-600 p-6 relative overflow-hidden group shadow-[4px_4px_0_0_#dc2626] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#dc2626] transition-all">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-red-600/10 -mr-10 -mt-10 transition-transform group-hover:scale-110"></div>
+                <div class="text-xs font-bold font-mono text-red-500 uppercase tracking-wider mb-2">Ocupación activa</div>
                 <h2 class="text-4xl font-black text-white mb-1">{{ metricas.get('alumnos_transportandose', 0) }}</h2>
                 <p class="text-sm font-mono text-kopi-gray">Asientos reservados confirmados</p>
             </div>
@@ -57,16 +57,16 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8">
-                <div class="bg-kopi-black border-4 border-kopi-gray p-6 shadow-[8px_8px_0_0_#52525b] h-full">
-                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-kopi-gray pb-2">Demanda de Viajes por Día</h5>
+                <div class="bg-kopi-black border-4 border-orange-500 p-6 shadow-[8px_8px_0_0_#f97316] h-full">
+                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-orange-500 pb-2">Demanda de Viajes por Día</h5>
                     <div class="relative h-[300px] w-full">
                         <canvas id="graficaViajes"></canvas>
                     </div>
                 </div>
             </div>
             <div class="lg:col-span-4">
-                <div class="bg-kopi-black border-4 border-kopi-gray p-6 shadow-[8px_8px_0_0_#52525b] h-full flex flex-col">
-                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-kopi-gray pb-2">Distribución del Ecosistema</h5>
+                <div class="bg-kopi-black border-4 border-orange-500 p-6 shadow-[8px_8px_0_0_#f97316] h-full flex flex-col">
+                    <h5 class="text-xl font-black font-mono text-white uppercase tracking-wider mb-6 border-b-2 border-orange-500 pb-2">Distribución del Ecosistema</h5>
                     <div class="relative flex-1 w-full flex items-center justify-center min-h-[250px]">
                         <canvas id="graficaDistribucion"></canvas>
                     </div>
