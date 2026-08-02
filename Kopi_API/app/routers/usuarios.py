@@ -85,12 +85,9 @@ def solicitar_ser_conductor(
         nombre_limpio = f"{usuario_actual.matricula}_{columna_db}{ext}"
         ruta_final = os.path.join(UPLOAD_DIR, nombre_limpio)
         
-        imagen_bytes = archivo.file.read()
-        
-        # Validación OCR deshabilitada
-        # Guardamos el flujo binario en el disco duro
+        # Restaurando el método original sin lectura en memoria (shutil.copyfileobj)
         with open(ruta_final, "wb") as buffer:
-            buffer.write(imagen_bytes)
+            shutil.copyfileobj(archivo.file, buffer)
             
         # Asignamos el string del nombre a la propiedad del modelo del usuario
         setattr(usuario_actual, columna_db, nombre_limpio)

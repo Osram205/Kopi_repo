@@ -1,4 +1,21 @@
-FROM php:8.4-apache
+# Etapa 1: Compilar assets frontend con Node moderno
+FROM node:22-alpine AS frontend-builder
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Etapa 2: Instalar dependencias PHP con Composer
+FROM composer:2.6.5 AS vendor-builder
+WORKDIR /app
+RUN apk update && apk add --no-cache git unzip zip zlib-dev libzip-dev
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction --ignore-platform-reqs
+COPY . .
+
+# Etapa 3: Imagen Final con Servidor Web Apache integrado
+FROM php:8.3-apache
 WORKDIR /var/www/html
 
 # Instalar extensiones necesarias de PHP
