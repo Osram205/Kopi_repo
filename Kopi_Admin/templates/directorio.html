@@ -22,14 +22,14 @@
         {% endif %}
         {% endwith %}
 
-        <div class="mb-8">
-            <h4 class="text-2xl font-bold text-white mb-1 tracking-tight">Directorio de usuarios activos</h4>
-            <p class="text-kopi-gray">Gestiona a los conductores y pasajeros ya evaluados. Aplica suspensiones en caso de reporte.</p>
+        <div class="mb-8 border-b-4 border-white pb-4">
+            <h4 class="text-4xl font-black font-mono text-white uppercase tracking-tighter mb-1">Directorio de usuarios activos</h4>
+            <p class="text-sm font-mono text-kopi-gray uppercase">Gestiona a los conductores y pasajeros ya evaluados. Aplica suspensiones en caso de reporte.</p>
         </div>
 
-        <div class="bg-kopi-card/50 backdrop-blur-md border border-white/5 rounded-2xl shadow-xl overflow-hidden mb-8">
-            <div class="border-b border-white/5">
-                <nav class="flex -mb-px px-6" aria-label="Tabs">
+        <div class="bg-kopi-black border-4 border-kopi-gray shadow-[8px_8px_0_0_#52525b] overflow-hidden mb-8">
+            <div class="border-b-4 border-kopi-gray bg-white/5">
+                <nav class="flex -mb-px px-6 font-mono font-bold uppercase" aria-label="Tabs">
                     <a href="/directorio" class="whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm transition-colors {% if not estatus_actual %}border-kopi-yellow text-kopi-yellow{% else %}border-transparent text-kopi-gray hover:text-white hover:border-white/20{% endif %}">
                         Todos
                     </a>
@@ -43,46 +43,46 @@
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse font-mono">
                     <thead>
-                        <tr class="border-b border-white/5 bg-kopi-dark/50">
-                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider">Matrícula</th>
-                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider">Nombre Completo</th>
-                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider">Estatus</th>
-                            <th class="py-4 px-6 text-xs font-bold text-kopi-gray uppercase tracking-wider text-center">Sanciones</th>
+                        <tr class="border-b-4 border-kopi-gray bg-kopi-dark">
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-kopi-gray">Matrícula</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-kopi-gray">Nombre Completo</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider border-r-2 border-kopi-gray">Estatus</th>
+                            <th class="py-4 px-6 text-sm font-black text-white uppercase tracking-wider text-center">Sanciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-white/5">
+                    <tbody class="divide-y-2 divide-kopi-gray">
                         {% if alumnos %}
                         {% for alumno in alumnos %}
-                        <tr class="hover:bg-white/[0.02] transition-colors">
-                            <td class="py-4 px-6 font-bold text-kopi-yellow">{{ alumno.matricula }}</td>
-                            <td class="py-4 px-6">
-                                <div class="text-white font-medium">{{ alumno.nombre }}</div>
-                                <div class="text-kopi-gray text-xs mt-0.5">{{ alumno.correo_institucional }}</div>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-6 font-bold text-kopi-yellow text-lg border-r-2 border-kopi-gray">{{ alumno.matricula }}</td>
+                            <td class="py-4 px-6 border-r-2 border-kopi-gray">
+                                <div class="text-white font-black uppercase">{{ alumno.nombre }}</div>
+                                <div class="text-kopi-gray text-xs mt-1 bg-white/10 inline-block px-1">{{ alumno.correo_institucional }}</div>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-6 border-r-2 border-kopi-gray">
                                 {% if alumno.estatus_verificacion == 'aprobado' %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-black uppercase bg-green-500 text-kopi-black border-2 border-green-500 shadow-[2px_2px_0_0_#22c55e]">
                                     Conductor Autorizado
                                 </span>
                                 {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10 text-kopi-gray border border-white/20">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-black uppercase bg-white text-kopi-black border-2 border-white shadow-[2px_2px_0_0_#ffffff]">
                                     Rechazado / Pasajero
                                 </span>
                                 {% endif %}
                             </td>
                             <td class="py-4 px-6 text-center">
-                                <div class="flex justify-center items-center gap-2">
+                                <div class="flex justify-center items-center gap-3">
                                     {% if alumno.estatus_verificacion == 'aprobado' %}
                                     <form action="/revocar/{{ alumno.id }}" method="POST" class="inline-block" onsubmit="return confirm('¿Seguro que deseas REVOCAR los permisos de conductor de este alumno? Se cancelarán sus viajes activos programados.');">
-                                        <button type="submit" class="px-3 py-1.5 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 rounded-lg text-xs font-bold transition-colors">
+                                        <button type="submit" class="px-4 py-2 bg-orange-500 text-kopi-black border-2 border-orange-500 hover:bg-kopi-black hover:text-orange-500 shadow-[4px_4px_0_0_#f97316] text-xs font-black uppercase transition-all">
                                             Revocar permiso
                                         </button>
                                     </form>
                                     {% endif %}
                                     <form action="/suspender/{{ alumno.id }}" method="POST" class="inline-block" onsubmit="return confirm('¿Confirmas la EXPULSIÓN DEFINITIVA de este alumno del sistema? No podrá volver a publicar ni reservar viajes.');">
-                                        <button type="submit" class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold transition-colors">
+                                        <button type="submit" class="px-4 py-2 bg-red-500 text-kopi-black border-2 border-red-500 hover:bg-kopi-black hover:text-red-500 shadow-[4px_4px_0_0_#ef4444] text-xs font-black uppercase transition-all">
                                             Suspender cuenta
                                         </button>
                                     </form>
