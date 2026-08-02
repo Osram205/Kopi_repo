@@ -53,11 +53,15 @@
                         <div>
                             <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">NOMBRES</label>
                             <input type="text" name="nombre" placeholder="TU NOMBRE(S)" value="{{ old('nombre') }}" required
+                                   maxlength="50" pattern="^[a-zA-Z\sÁÉÍÓÚáéíóúÑñ]+$"
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z\sÁÉÍÓÚáéíóúÑñ]/g, '').slice(0, 50)"
                                    class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         </div>
                         <div>
                             <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">APELLIDOS</label>
                             <input type="text" name="apellidos" placeholder="TUS APELLIDOS" value="{{ old('apellidos') }}" required
+                                   maxlength="50" pattern="^[a-zA-Z\sÁÉÍÓÚáéíóúÑñ]+$"
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z\sÁÉÍÓÚáéíóúÑñ]/g, '').slice(0, 50)"
                                    class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         </div>
                     </div>
@@ -65,7 +69,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">MATRÍCULA</label>
-                            <input type="text" name="matricula" placeholder="123456" value="{{ old('matricula') }}" required
+                            <input type="text" id="matricula" name="matricula" placeholder="123456" value="{{ old('matricula') }}" required
+                                   minlength="9" maxlength="9" pattern="[0-9]{9}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)"
                                    class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         </div>
                         <div>
@@ -85,13 +91,16 @@
 
                     <div>
                         <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">CORREO INSTITUCIONAL</label>
-                        <input type="email" name="correo_institucional" placeholder="ALUMNO@UPQ.EDU.MX" value="{{ old('correo_institucional') }}" required
+                        <input type="email" id="correo_institucional" name="correo_institucional" placeholder="ALUMNO@UPQ.EDU.MX" value="{{ old('correo_institucional') }}" required
+                               maxlength="100"
                                class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                     </div>
 
                     <div>
                         <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">TELÉFONO CELULAR (WHATSAPP)</label>
                         <input type="tel" name="telefono" placeholder="442..." value="{{ old('telefono') }}" required
+                               minlength="10" maxlength="10" pattern="[0-9]{10}"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
                                class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                     </div>
 
@@ -99,6 +108,7 @@
                         <div>
                             <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">CREAR CONTRASEÑA</label>
                             <input type="password" name="contrasena" placeholder="MÍN. 6 CARACTERES" required
+                                   minlength="6" maxlength="32"
                                    class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         </div>
                     </div>
@@ -121,5 +131,32 @@
     </div>
 
     @livewireScripts
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const matriculaInput = document.getElementById('matricula');
+            const correoInput = document.getElementById('correo_institucional');
+            let correoModificadoManualmente = false;
+
+            correoInput.addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    correoModificadoManualmente = false;
+                } else {
+                    correoModificadoManualmente = true;
+                }
+            });
+
+            matriculaInput.addEventListener('input', function() {
+                if (!correoModificadoManualmente) {
+                    const matricula = this.value;
+                    if (matricula) {
+                        correoInput.value = matricula + '@upq.edu.mx';
+                    } else {
+                        correoInput.value = '';
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

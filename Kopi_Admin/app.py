@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import requests
 import os
+import re
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -39,8 +40,18 @@ def login():
     if "admin_token" in session:
         return redirect(url_for("dashboard"))
     if request.method == "POST":
-        correo = request.form.get("correo")
-        password = request.form.get("password")
+        correo = request.form.get("correo", "")
+        password = request.form.get("password", "")
+
+        # Validaciones de backend
+        if len(correo) > 100 or not re.match(r"[^@]+@[^@]+\.[^@]+", correo):
+            flash("Formato de correo inválido o excede longitud.", "danger")
+            return render_template("login.html")
+            
+        if len(password) < 6 or len(password) > 32:
+            flash("La contraseña debe tener entre 6 y 32 caracteres.", "danger")
+            return render_template("login.html")
+
         try:
             # CORRECCIÓN CLAVE: Enviamos como formulario (data=) usando 'username' y 'password'
             # para acoplarnos al cambio de OAuth2PasswordRequestForm en FastAPI

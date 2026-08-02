@@ -18,8 +18,8 @@ class AuthController extends Controller
     public function procesarLogin(Request $request)
     {
         $request->validate([
-            'correo_institucional' => 'required|email',
-            'contrasena' => 'required|string',
+            'correo_institucional' => 'required|email|max:100',
+            'contrasena' => 'required|string|min:6|max:32',
         ]);
 
         try {
@@ -58,13 +58,13 @@ class AuthController extends Controller
     {
         // 1. Validamos todos los campos del formulario
         $request->validate([
-            'nombre' => 'required|string|max:100',
-            'apellidos' => 'required|string|max:100',
-            'matricula' => 'required|string|max:20',
+            'nombre' => 'required|string|max:50|regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/',
+            'apellidos' => 'required|string|max:50|regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚñÑ]+$/',
+            'matricula' => 'required|digits:9',
             'carrera' => 'required|string|max:100',
-            'telefono' => 'required|string|max:15',
-            'correo_institucional' => 'required|email|ends_with:@upq.edu.mx',
-            'contrasena' => 'required|string|min:6'
+            'telefono' => 'required|digits:10',
+            'correo_institucional' => 'required|email|max:100|ends_with:@upq.edu.mx',
+            'contrasena' => 'required|string|min:6|max:32'
         ], [
             'correo_institucional.ends_with' => 'Debes usar tu correo institucional (@upq.edu.mx).'
         ]);

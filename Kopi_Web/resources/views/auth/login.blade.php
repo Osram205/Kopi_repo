@@ -49,6 +49,7 @@
                     <div>
                         <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">CORREO INSTITUCIONAL</label>
                         <input type="email" name="correo_institucional" placeholder="ALUMNO@UPQ.EDU.MX" value="{{ old('correo_institucional') }}" required
+                               maxlength="100"
                                class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         @error('correo_institucional')
                             <p class="mt-2 text-sm text-accent-500 font-bold uppercase">{{ $message }}</p>
@@ -58,6 +59,7 @@
                     <div>
                         <label class="block text-sm font-black text-white mb-2 uppercase tracking-wider">CONTRASEÑA</label>
                         <input type="password" name="contrasena" placeholder="••••••••" required
+                               minlength="6" maxlength="32"
                                class="w-full bg-black border-4 border-gray-800 rounded-none py-3 px-4 text-white font-bold focus:outline-none focus:border-primary-500 transition-colors uppercase">
                         @error('contrasena')
                             <p class="mt-2 text-sm text-accent-500 font-bold uppercase">{{ $message }}</p>
