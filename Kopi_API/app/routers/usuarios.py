@@ -97,3 +97,18 @@ def solicitar_ser_conductor(
     db.commit()
     
     return {"mensaje": "Expediente digital guardado. Solicitud en proceso de evaluación institucional."}
+
+from pydantic import BaseModel
+
+class TokenRequest(BaseModel):
+    fcm_token: str
+
+@router.post("/fcm-token")
+def guardar_fcm_token(
+    request: TokenRequest,
+    db: Session = Depends(database.get_db),
+    usuario_actual: models.Usuario = Depends(oauth2.get_current_user)
+):
+    usuario_actual.fcm_token = request.fcm_token
+    db.commit()
+    return {"mensaje": "Token Push guardado exitosamente"}

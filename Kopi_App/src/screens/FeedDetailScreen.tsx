@@ -1,12 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Linking, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FeedStackParamList } from '../navigation/types';
+import { PaymentService } from '../services/payment.service';
 
 type Props = NativeStackScreenProps<FeedStackParamList, 'FeedDetail'>;
 
 export default function FeedDetailScreen({ route, navigation }: Props) {
-  const { destino, imageUrl, precio, description, conductor, vehiculo, paradas } = route.params;
+  const { destino, imageUrl, costo_por_asiento, description, conductor, vehiculo, paradas } = route.params;
+
+  const [reservationStatus, setReservationStatus] = useState<'none' | 'reserved' | 'paid'>('none');
+  const [mockReservacionId, setMockReservacionId] = useState<number | null>(null);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -16,6 +20,45 @@ export default function FeedDetailScreen({ route, navigation }: Props) {
       headerShadowVisible: false,
     });
   }, [navigation]);
+
+  const handleReserve = () => {
+    // Simulamos que se hace la reserva
+    setMockReservacionId(Math.floor(Math.random() * 1000) + 1);
+    setReservationStatus('reserved');
+    Alert.alert('Reserva Exitosa', 'Tu reserva ha sido aceptada por el conductor.');
+  };
+
+  const handlePayment = async () => {
+    if (!mockReservacionId) return;
+    try {
+      const response = await PaymentService.createCheckout({
+        reservacion_id: mockReservacionId,
+        metodo_pago: 'tarjeta'
+      });
+      if (response.checkout_url) {
+        Linking.openURL(response.checkout_url);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'No se pudo iniciar el pago');
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!mockReservacionId) return;
+    try {
+      await PaymentService.confirmPayment({
+        reservacion_id: mockReservacionId,
+        metodo_pago: 'tarjeta',
+        session_id: 'mock_session_123'
+      });
+      setReservationStatus('paid');
+      Alert.alert('Pago Confirmado', 'Tu asiento ha sido pagado exitosamente.');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'No se pudo confirmar el pago');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -27,11 +70,11 @@ export default function FeedDetailScreen({ route, navigation }: Props) {
           <View style={styles.headerRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.title}>{destino}</Text>
-              <Text style={styles.location}>Conductor: {conductor.nombre}</Text>
-              <Text style={styles.location}>Vehículo: {vehiculo.marca}</Text>
+              <Text style={styles.location}>Conductor: {conductor?.nombre || 'Desconocido'}</Text>
+              <Text style={styles.location}>Vehículo: {vehiculo?.marca || 'Auto'}</Text>
             </View>
             <View style={styles.ratingBadge}>
-              <Text style={styles.ratingText}>★ {conductor.calificacion}</Text>
+              <Text style={styles.ratingText}>★ {conductor?.calificacion || '5.0'}</Text>
             </View>
           </View>
 
@@ -48,7 +91,7 @@ export default function FeedDetailScreen({ route, navigation }: Props) {
               <View style={styles.amenitiesContainer}>
                 {paradas.map((parada, index) => (
                   <View key={index} style={styles.amenityTag}>
-                    <Text style={styles.amenityText}>{parada}</Text>
+                    <Text style={styles.amenityText}>{parada.ubicacion}</Text>
                   </View>
                 ))}
               </View>
@@ -62,14 +105,35 @@ export default function FeedDetailScreen({ route, navigation }: Props) {
       <View style={styles.footer}>
         <View>
           <Text style={styles.priceLabel}>Precio total</Text>
-          <Text style={styles.priceValue}>{precio}</Text>
+          <Text style={styles.priceValue}>${costo_por_asiento}</Text>
         </View>
-        <TouchableOpacity 
-          style={styles.bookButton}
-          onPress={() => navigation.navigate('Tracking', route.params)}
-        >
-          <Text style={styles.bookButtonText}>Seguir Viaje</Text>
-        </TouchableOpacity>
+        <View style={styles.actionsContainer}>
+          {reservationStatus === 'none' && (
+            <TouchableOpacity style={styles.bookButton} onPress={handleReserve}>
+              <Text style={styles.bookButtonText}>Reservar</Text>
+            </TouchableOpacity>
+          )}
+          
+          {reservationStatus === 'reserved' && (
+            <>
+              <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
+                <Text style={styles.payButtonText}>Pagar Asiento</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.simButton} onPress={handleConfirm}>
+                <Text style={styles.simButtonText}>Simular Confirmar</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {reservationStatus === 'paid' && (
+            <TouchableOpacity 
+              style={styles.bookButton}
+              onPress={() => navigation.navigate('Tracking', route.params)}
+            >
+              <Text style={styles.bookButtonText}>Seguir Viaje</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -100,6 +164,11 @@ const styles = StyleSheet.create({
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24, backgroundColor: '#09090B', borderTopWidth: 1, borderTopColor: '#27272A' },
   priceLabel: { fontSize: 14, color: '#A1A1AA', marginBottom: 4 },
   priceValue: { fontSize: 24, fontWeight: '800', color: '#FFFFFF' },
+  actionsContainer: { flexDirection: 'column', gap: 8, alignItems: 'flex-end' },
   bookButton: { backgroundColor: '#FBBF24', paddingHorizontal: 32, paddingVertical: 16, borderRadius: 16 },
-  bookButtonText: { color: '#09090B', fontSize: 16, fontWeight: 'bold' }
+  bookButtonText: { color: '#09090B', fontSize: 16, fontWeight: 'bold' },
+  payButton: { backgroundColor: '#10B981', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 16 },
+  payButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' },
+  simButton: { backgroundColor: '#3B82F6', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 16 },
+  simButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: 'bold' }
 });

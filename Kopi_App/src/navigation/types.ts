@@ -1,29 +1,17 @@
 export type RootStackParamList = {
   Login: undefined;
   Main: undefined;
+  PublishTrip: undefined;
+  AddVehicle: undefined;
 };
 
 export type BottomTabParamList = {
   Feed: undefined;
+  PublishTrip: undefined;
   Profile: undefined;
 };
 
-export type Viaje = {
-  id: string;
-  destino: string;
-  precio: string;
-  conductor: {
-    nombre: string;
-    calificacion: string;
-  };
-  vehiculo: {
-    marca: string;
-    placa: string;
-  };
-  paradas?: string[];
-  imageUrl: string;
-  description: string;
-};
+export type { Viaje } from '../types/trip.types';
 
 export type FeedStackParamList = {
   FeedList: undefined;

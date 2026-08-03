@@ -24,7 +24,7 @@ class MisViajes extends Component
             $session_id = request()->query('session_id'); // <-- ATRAPAMOS EL ID CRIPTOGRÁFICO DE STRIPE
 
             // Enviamos la prueba a FastAPI para que audite
-            $response = Http::withToken($token)->post(config('services.fastapi.url') . '/pagos/confirmar', [
+            $response = Http::withToken($token)->post(config('services.fastapi.url') . '/pagos/confirmar/', [
                 'reservacion_id' => (int) $reserva_id,
                 'metodo_pago' => $metodo,
                 'session_id' => $session_id // <-- LO ENVIAMOS AL BACKEND
@@ -49,7 +49,7 @@ class MisViajes extends Component
     public function cargarViajes()
     {
         $token = Session::get('jwt_token');
-        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/reservaciones?rol=pasajero');
+        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/reservaciones/?rol=pasajero');
 
         if ($response->successful()) {
             $this->misReservas = $response->json();
@@ -74,7 +74,7 @@ class MisViajes extends Component
 
         try {
             // Pedimos el túnel de cobro a FastAPI
-            $response = Http::withToken($token)->post(config('services.fastapi.url') . '/pagos/checkout', [
+            $response = Http::withToken($token)->post(config('services.fastapi.url') . '/pagos/checkout/', [
                 'reservacion_id' => (int) $this->reservacionSeleccionadaId,
                 'monto' => (float) $this->montoPago,
                 'metodo_pago' => $this->metodo_pago

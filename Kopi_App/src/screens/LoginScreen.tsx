@@ -1,23 +1,56 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
+import { useAuth } from '../context/AuthContext';
+import { extractApiErrorMessage } from '../services/auth.service';
 
-export default function LoginScreen({ navigation }: Props) {
+export default function LoginScreen() {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = () => {
-    // Navigate to Main flow
-    navigation.replace('Main');
+  const handleLogin = async () => {
+    setErrorMessage(null);
+
+    if (!email.trim() || !password) {
+      setErrorMessage('Ingresa tu correo institucional y tu contraseña.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await login({
+        correo_institucional: email.trim().toLowerCase(),
+        contrasena: password,
+      });
+      // No hay que navegar manualmente: en cuanto `login()` actualiza
+      // el estado de autenticación, RootNavigator monta "Main" solo.
+    } catch (error) {
+      setErrorMessage(
+        extractApiErrorMessage(error, 'No se pudo iniciar sesión. Intenta de nuevo.')
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
       >
         <View style={styles.content}>
@@ -30,12 +63,14 @@ export default function LoginScreen({ navigation }: Props) {
             <Text style={styles.label}>Correo electrónico</Text>
             <TextInput
               style={styles.input}
-              placeholder="ejemplo@kopi.com"
+              placeholder="ejemplo@upq.edu.mx"
               placeholderTextColor="#666"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              editable={!isSubmitting}
             />
 
             <Text style={styles.label}>Contraseña</Text>
@@ -46,20 +81,36 @@ export default function LoginScreen({ navigation }: Props) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              editable={!isSubmitting}
             />
 
-            <TouchableOpacity style={styles.forgotPassword}>
+            {errorMessage ? (
+              <View style={styles.errorBox}>
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              </View>
+            ) : null}
+
+            <TouchableOpacity style={styles.forgotPassword} disabled={isSubmitting}>
               <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+            <TouchableOpacity
+              style={[styles.loginButton, isSubmitting && styles.loginButtonDisabled]}
+              onPress={handleLogin}
+              disabled={isSubmitting}
+              activeOpacity={0.8}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#09090B" />
+              ) : (
+                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+              )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>¿No tienes una cuenta? </Text>
-            <TouchableOpacity>
+            <TouchableOpacity disabled={isSubmitting}>
               <Text style={styles.registerText}>Regístrate</Text>
             </TouchableOpacity>
           </View>
@@ -117,6 +168,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
+  errorBox: {
+    backgroundColor: '#3F1D1D',
+    borderWidth: 1,
+    borderColor: '#7F1D1D',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+  },
+  errorText: {
+    color: '#FCA5A5',
+    fontSize: 14,
+    textAlign: 'center',
+  },
   forgotPassword: {
     alignSelf: 'flex-end',
     marginTop: 12,
@@ -137,6 +201,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
   loginButtonText: {
     color: '#09090B',

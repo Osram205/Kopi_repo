@@ -22,7 +22,7 @@ class GestorReservaciones extends Component
     public function cargarReservaciones()
     {
         $token = Session::get('jwt_token');
-        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/reservaciones?rol=conductor');
+        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/reservaciones/?rol=conductor');
 
         if ($response->successful()) {
             $this->reservaciones = $response->json();

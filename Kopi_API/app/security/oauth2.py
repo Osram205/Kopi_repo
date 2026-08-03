@@ -63,10 +63,12 @@ def decode_access_token(token: str) -> dict:
 
         payload = json.loads(_b64url_decode(payload_b64))
         if int(payload.get("exp", 0)) < int(datetime.now(timezone.utc).timestamp()):
+            print(f"Token expired: exp={payload.get('exp')} current={int(datetime.now(timezone.utc).timestamp())}")
             raise credentials_exception
 
         return payload
     except Exception as exc:
+        print(f"Token validation failed: {exc}")
         if isinstance(exc, HTTPException):
             raise exc
         raise credentials_exception from exc

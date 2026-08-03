@@ -39,7 +39,7 @@ class PublicarViaje extends Component
         $token = Session::get('jwt_token');
         
         // 1. Obtenemos los vehículos del conductor logueado
-        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/vehiculos');
+        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/vehiculos/');
 
         if ($response->successful()) {
             $this->vehiculos = $response->json();
@@ -128,7 +128,7 @@ class PublicarViaje extends Component
         foreach ($fechas_a_crear as $fecha) {
             $payload = $basePayload;
             $payload['fecha_salida'] = $fecha;
-            $response = Http::withToken($token)->post(config('services.fastapi.url') . '/viajes', $payload);
+            $response = Http::withToken($token)->post(config('services.fastapi.url') . '/viajes/', $payload);
             if (!$response->successful()) {
                 $todosExitosos = false;
             }

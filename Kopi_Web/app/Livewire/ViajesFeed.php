@@ -20,7 +20,7 @@ class ViajesFeed extends Component
     public function cargarViajes()
     {
         $token = Session::get('jwt_token');
-        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/viajes');
+        $response = Http::withToken($token)->get(config('services.fastapi.url') . '/viajes/');
         
         if ($response->successful()) {
             $this->todosLosViajes = $response->json();
@@ -48,7 +48,7 @@ class ViajesFeed extends Component
         ];
 
         // Disparamos la petición a FastAPI
-        $response = Http::withToken($token)->post(config('services.fastapi.url') . '/reservaciones', $payload);
+        $response = Http::withToken($token)->post(config('services.fastapi.url') . '/reservaciones/', $payload);
 
         if ($response->successful()) {
             session()->flash('success', '¡Asiento solicitado con éxito! Notificación enviada al conductor.');

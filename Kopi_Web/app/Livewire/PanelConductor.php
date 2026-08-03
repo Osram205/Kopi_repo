@@ -111,7 +111,7 @@ class PanelConductor extends Component
         ];
 
         // Enviamos la petición a FastAPI
-        $response = Http::withToken($token)->post(config('services.fastapi.url') . '/vehiculos', $payload);
+        $response = Http::withToken($token)->post(config('services.fastapi.url') . '/vehiculos/', $payload);
 
         if ($response->successful()) {
             session()->flash('success', '¡Vehículo registrado con éxito! Tu perfil de conductor está activo.');

@@ -1,33 +1,40 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FeedStackParamList, Viaje } from '../navigation/types';
+import { tripService } from '../services/trip.service';
 
 type Props = NativeStackScreenProps<FeedStackParamList, 'FeedList'>;
 
-const DATA: Viaje[] = [
-  { 
-    id: '1', 
-    destino: 'Buenos Aires, Argentina', 
-    precio: '$1,200',
-    conductor: { nombre: 'Juan Perez', calificacion: '4.9' },
-    vehiculo: { marca: 'Toyota Corolla', placa: 'AB-123-CD' },
-    paradas: ['Rosario', 'Campana'],
-    description: 'Viaje tranquilo hacia Buenos Aires, saliendo temprano.',
-    imageUrl: 'https://images.unsplash.com/photo-1544463878-a3f29bb5ebfb?q=80&w=600&auto=format&fit=crop'
-  },
-  { 
-    id: '2', 
-    destino: 'Cordoba, Argentina', 
-    precio: '$2,500',
-    conductor: { nombre: 'Maria Gomez', calificacion: '4.8' },
-    vehiculo: { marca: 'Honda Civic', placa: 'UMK-987' },
-    description: 'Viaje a Cordoba, con buena música y aire acondicionado.',
-    imageUrl: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=600&auto=format&fit=crop'
-  }
-];
-
 export default function FeedScreen({ navigation }: Props) {
+  const [viajes, setViajes] = useState<Viaje[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchViajes();
+  }, []);
+
+  const fetchViajes = async () => {
+    try {
+      const data = await tripService.listarViajes();
+      setViajes(data);
+    } catch (error) {
+      console.error('Error fetching viajes', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color="#FBBF24" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -37,8 +44,8 @@ export default function FeedScreen({ navigation }: Props) {
         </View>
 
         <FlatList
-          data={DATA}
-          keyExtractor={item => item.id}
+          data={viajes}
+          keyExtractor={item => String(item.id)}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
           renderItem={({ item }) => (
@@ -47,18 +54,18 @@ export default function FeedScreen({ navigation }: Props) {
               activeOpacity={0.8}
               onPress={() => navigation.navigate('FeedDetail', item)}
             >
-              <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+              <Image source={{ uri: item.imageUrl || 'https://images.unsplash.com/photo-1544463878-a3f29bb5ebfb?q=80&w=600&auto=format&fit=crop' }} style={styles.cardImage} />
               <View style={styles.cardOverlay}>
                 <View style={styles.ratingBadge}>
-                  <Text style={styles.ratingText}>★ {item.conductor.calificacion}</Text>
+                  <Text style={styles.ratingText}>★ {item.conductor?.calificacion || '5.0'}</Text>
                 </View>
               </View>
               <View style={styles.cardContent}>
                 <View style={styles.titleRow}>
                   <Text style={styles.cardTitle}>{item.destino}</Text>
-                  <Text style={styles.cardPrice}>{item.precio}</Text>
+                  <Text style={styles.cardPrice}>${item.costo_por_asiento}</Text>
                 </View>
-                <Text style={styles.cardLocation}>🚗 Conductor: {item.conductor.nombre} - {item.vehiculo.marca}</Text>
+                <Text style={styles.cardLocation}>🚗 Conductor: {item.conductor?.nombre || 'Desconocido'} - {item.vehiculo?.marca || 'Auto'}</Text>
               </View>
             </TouchableOpacity>
           )}
